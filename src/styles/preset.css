@@ -1,0 +1,14 @@
+/*
+ * Color palette preset.
+ * Tailwind v4 has no JS `theme.extend` config — this @theme block is its
+ * CSS-based equivalent, generating utilities like `bg-brand-blue`,
+ * `text-brand-pink`, `border-brand-green`, etc.
+ */
+@theme {
+  --color-brand-blue: #a6c2d2;
+  --color-brand-pink: #d9bfb1;
+  --color-brand-green: #b8d2c7;
+  --color-brand-yellow: #f5e0ae;
+  --color-brand-black: #615f5f;
+  --color-brand-bg: #f4f4f2;
+}
