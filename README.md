@@ -14,3 +14,18 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Color palette
+
+The project's color palette lives in [`src/styles/preset.css`](src/styles/preset.css), imported by `src/index.css`. Tailwind v4 doesn't have a JS `theme.extend` config, so the palette is defined with Tailwind's CSS-based `@theme` equivalent, which generates matching utility classes (e.g. `bg-brand-blue`, `text-brand-pink`).
+
+| Name   | Utility prefix | Hex       |
+| ------ | --------------- | --------- |
+| Blue   | `brand-blue`    | `#A6C2D2` |
+| Pink   | `brand-pink`    | `#D9BFB1` |
+| Green  | `brand-green`   | `#B8D2C7` |
+| Yellow | `brand-yellow`  | `#F5E0AE` |
+| Black  | `brand-black`   | `#615F5F` |
+| Background | `brand-bg`  | `#F4F4F2` |
+
+Example usage: `<div className="bg-brand-bg text-brand-black">`.
