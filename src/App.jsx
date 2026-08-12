@@ -2,10 +2,20 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
+import LoginPage from './pages/LoginPage'
 import './App.css'
+
+// Temporary switch while we work on the login page in isolation.
+// Flip to false to get the original template page back.
+// Replaced by a real router (react-router-dom) once we add one.
+const SHOW_LOGIN = true
 
 function App() {
   const [count, setCount] = useState(0)
+
+  if (SHOW_LOGIN) {
+    return <LoginPage />
+  }
 
   return (
     <>
