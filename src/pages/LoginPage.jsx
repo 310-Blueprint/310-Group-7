@@ -5,6 +5,7 @@
  * utilities: bg-brand-bg, text-brand-black, bg-brand-blue, bg-brand-pink,
  * bg-brand-green, bg-brand-yellow (also border-*, hover:bg-*, etc.)
  */
+import Field from '../components/Field'
 import grassSingle from '../assets/grassSingle.svg'
 import grassDouble from '../assets/grassDouble.svg'
 import beaver from '../assets/beaver.png'
@@ -30,31 +31,29 @@ function LoginPage() {
 
           <div className="relative z-10 -mt-12 w-full max-w-xl bg-brand-bg text-brand-black rounded-2xl pt-10 pb-2 px-22">        
             <form onSubmit={handleSubmit}>
-              <label htmlFor="email" className="block mb-1">
-                Email address
-              </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Enter your email address"
-                  className="w-full bg-[#CFD3D5] placeholder:text-[#B0B0B0] rounded-xl pl-3 p-2 mb-5 focus:outline-none focus:ring-2 focus:ring-brand-blue"
-                />
+              <Field
+                id="email"
+                label="Email address"
+                type="email"
+                autoComplete="email"
+                placeholder="Enter your email address"
+                className="mb-5"
+              />
 
-              <label htmlFor="password" className="block mb-1">
-                Password
-              </label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  className="w-full bg-[#CFD3D5] placeholder:text-[#B0B0B0] rounded-xl pl-3 p-2 mb-5 focus:outline-none focus:ring-2 focus:ring-brand-blue"
-                  />
+              <Field
+                id="password"
+                label="Password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                className="mb-2"
+              />
 
-                <p className="text-right text-[#81A1B3] underline mb-5">
-                  Forgot password?
-                </p>
+                <div className="flex justify-end w-full">
+                  <a className="text-link underline mb-5" href="#">
+                    Forgot password?
+                  </a>
+                </div>
                 
                 <div className="mx-20 mb-5">
                   <button
@@ -68,9 +67,9 @@ function LoginPage() {
 
               <div className="flex justify-center gap-1">
                 <p>Don't have an account? </p>
-                <p className="text-[#81A1B3] underline mb-5">
+                <a className="text-link underline mb-5" href="#">
                   Create account
-                </p>
+                </a>
               </div>
 
               {/* Decorative assets. Absolute against the card, which is `relative`.
