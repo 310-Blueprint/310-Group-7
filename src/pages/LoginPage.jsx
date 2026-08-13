@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
+import AuthButton from '../components/AuthButton'
 import AuthCard from '../components/AuthCard'
-import Button from '../components/AuthButton'
+import AuthFooter from '../components/AuthFooter'
 import Field from '../components/Field'
 
 function LoginPage() {
@@ -37,15 +38,14 @@ function LoginPage() {
           </Link>
         </div>
 
-        <Button className="mx-20 mb-5">Log In</Button>
+        <AuthButton>Log In</AuthButton>
       </form>
 
-      <div className="flex justify-center gap-1">
-        <p>Don&apos;t have an account?</p>
-        <Link className="text-link underline mb-5" to="/signup">
-          Create account
-        </Link>
-      </div>
+      <AuthFooter
+        prompt="Don't have an account?"
+        linkText="Create account"
+        to="/signup"
+      />
     </AuthCard>
   )
 }

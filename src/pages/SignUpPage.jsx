@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
+import AuthButton from '../components/AuthButton'
 import AuthCard from '../components/AuthCard'
-import Button from '../components/AuthButton'
+import AuthFooter from '../components/AuthFooter'
 import Field from '../components/Field'
 
 function SignUpPage() {
@@ -39,15 +39,14 @@ function SignUpPage() {
           className="mb-5"
         />
 
-        <Button className="mx-20 mb-5">Create Account</Button>
+        <AuthButton>Create Account</AuthButton>
       </form>
 
-      <div className="flex justify-center gap-1">
-        <p>Already have an account?</p>
-        <Link className="text-link underline mb-5" to="/">
-          Log in
-        </Link>
-      </div>
+      <AuthFooter
+        prompt="Already have an account?"
+        linkText="Log in"
+        to="/"
+      />
     </AuthCard>
   )
 }

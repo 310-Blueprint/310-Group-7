@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
+import AuthButton from '../components/AuthButton'
 import AuthCard from '../components/AuthCard'
-import Button from '../components/AuthButton'
+import AuthFooter from '../components/AuthFooter'
 import Field from '../components/Field'
 
 function ForgotPasswordPage() {
@@ -26,15 +26,10 @@ function ForgotPasswordPage() {
           className="mb-5"
         />
 
-        <Button className="mx-20 mb-5">Send reset link</Button>
+        <AuthButton>Send reset link</AuthButton>
       </form>
 
-      <div className="flex justify-center gap-1">
-        <p>Remembered it?</p>
-        <Link className="text-link underline mb-5" to="/">
-          Back to log in
-        </Link>
-      </div>
+      <AuthFooter prompt="Remembered it?" linkText="Back to log in" to="/" />
     </AuthCard>
   )
 }

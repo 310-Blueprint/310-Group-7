@@ -12,6 +12,11 @@ import grassDouble from '../assets/grassDouble.svg'
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 
+// The two beaver layers are the same artwork split in half, so they have to
+// sit at exactly the same spot — only their z-index differs. Sharing one
+// position means they cannot drift apart.
+const BEAVER_POSITION = 'pointer-events-none absolute -top-6 right-4 w-30'
+
 function AuthCard({ title, children }) {
   return (
     <main className="relative grid min-h-screen place-items-center bg-brand-black py-6 px-4 text-brand-bg">
@@ -30,7 +35,6 @@ function AuthCard({ title, children }) {
 
         <div className="relative z-10 -mt-12 w-full bg-brand-bg text-brand-black rounded-2xl pt-10 pb-2 px-22">
           {children}
-
           {/* Decorative assets. Absolute against the card, which is `relative`.
               pointer-events-none so it can never swallow a click on the form. */}
           <img
@@ -48,21 +52,20 @@ function AuthCard({ title, children }) {
           />
         </div>
 
-        {/* Beaver sits OUTSIDE the card so the card can paint over its body.
-            Both layers share identical positioning — only the z-index differs:
+        {/* Beaver sits OUTSIDE the card so the card can paint over its body:
             body behind the card (z-0), arms draped over the front (z-20). */}
         <img
           src={beaver}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-6 right-4 z-0 w-30"
+          className={`${BEAVER_POSITION} z-0`}
         />
 
         <img
           src={beaverArms}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-6 right-4 z-20 w-30"
+          className={`${BEAVER_POSITION} z-20`}
         />
       </div>
     </main>
