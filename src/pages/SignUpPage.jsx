@@ -3,15 +3,14 @@ import AuthCard from '../components/AuthCard'
 import Button from '../components/AuthButton'
 import Field from '../components/Field'
 
-function LoginPage() {
+function SignUpPage() {
   function handleSubmit(event) {
-    // Stops the browser doing a full page reload on submit.
-    // Supabase sign-in goes here later.
+    // TODO: Supabase signUp goes here later. Password confirmation needs checking before we call it
     event.preventDefault()
   }
 
   return (
-    <AuthCard title="LOGIN">
+    <AuthCard title="SIGN UP">
       <form onSubmit={handleSubmit}>
         <Field
           id="email"
@@ -26,28 +25,31 @@ function LoginPage() {
           id="password"
           label="Password"
           type="password"
-          autoComplete="current-password"
-          placeholder="Enter your password"
-          className="mb-2"
+          autoComplete="new-password"
+          placeholder="Create a password"
+          className="mb-5"
         />
 
-        <div className="flex justify-end w-full">
-          <Link className="text-link underline mb-5" to="/forgot-password">
-            Forgot password?
-          </Link>
-        </div>
+        <Field
+          id="confirmPassword"
+          label="Confirm password"
+          type="password"
+          autoComplete="new-password"
+          placeholder="Re-enter your password"
+          className="mb-5"
+        />
 
-        <Button className="mx-20 mb-5">Log In</Button>
+        <Button className="mx-20 mb-5">Create Account</Button>
       </form>
 
       <div className="flex justify-center gap-1">
-        <p>Don&apos;t have an account?</p>
-        <Link className="text-link underline mb-5" to="/signup">
-          Create account
+        <p>Already have an account?</p>
+        <Link className="text-link underline mb-5" to="/">
+          Log in
         </Link>
       </div>
     </AuthCard>
   )
 }
 
-export default LoginPage
+export default SignUpPage
