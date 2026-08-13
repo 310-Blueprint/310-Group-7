@@ -5,10 +5,14 @@
  * `text-brand-pink`, `border-brand-green`, etc.
  */
 @theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --color-brand-blue: #a6c2d2;
   --color-brand-pink: #d9bfb1;
   --color-brand-green: #b8d2c7;
   --color-brand-yellow: #f5e0ae;
   --color-brand-black: #353434;
   --color-brand-bg: #f4f4f2;
+  --color-link: #81a1b3;
+  --color-input-bg: #cfd3d5;
+  --color-input-placeholder: #b0b0b0;
 }

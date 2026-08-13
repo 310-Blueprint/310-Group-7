@@ -3,6 +3,6 @@
 
 @layer base {
     body {
-        background-color: var(--color-brand-bg);
+      background-color: var(--color-brand-bg);
     }
   }
