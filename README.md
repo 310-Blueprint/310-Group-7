@@ -72,7 +72,24 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ### Deployment
 
-*(Add deployment steps once decided — e.g. Vercel, Netlify. Include build command, e.g. `npm run build`.)*
+Pipeline is deployed using [Netlify](https://www.netlify.com/).
+
+**Live Site:** [https://pipeline.netlify.app](https://pipeline.netlify.app) *(update with your actual Netlify URL)*
+
+- The `main` branch is connected to Netlify and automatically deploys on every push/merge.
+- Pull request previews are automatically generated for review before merging (if enabled).
+
+**Build settings:**
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+
+**Environment variables:** set the same keys used locally (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) under **Netlify → Site settings → Environment variables**.
+
+## License
+
+This project is licensed under the terms described in [LICENSE](./LICENSE).
 
 ## Versioning
 
@@ -91,10 +108,6 @@ Want to contribute code? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the fork/b
 ## Code of Conduct
 
 Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
-
-## License
-
-This project is licensed under the terms described in [LICENSE](./LICENSE).
 
 ## Acknowledgements
 
