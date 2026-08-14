@@ -99,12 +99,12 @@ This project is licensed under the terms described in [LICENSE](./LICENSE).
 ## Acknowledgements
 
 **Contributors:**
-- Abbey Martinez 
-- Caitlin Kuan
-- Navini Ariyasinghe 
-- Julianne Gabas
-- Alyza So
-- Orion Lim
+- Abbey Martinez (amar379@aucklanduni.ac.nz)
+- Caitlin Kuan (ckua141@aucklanduni.ac.nz)
+- Navini Ariyasinghe (kari487@aucklanduni.ac.nz)
+- Julianne Gabas (jgab318@aucklanduni.ac.nz)
+- Alyza So (aso060@aucklanduni.ac.nz)
+- Orion Lim (olim735@aucklanduni.ac.nz)
 
 **Built with:**
 - [React](https://react.dev/)
