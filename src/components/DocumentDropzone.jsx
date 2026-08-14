@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import addDocument from '../assets/addDocument.png'
 
 function DocumentDropzone({ onFilesDropped }) {
   const [isDragging, setIsDragging] = useState(false)
@@ -24,7 +25,7 @@ function DocumentDropzone({ onFilesDropped }) {
         isDragging ? 'border-brand-black/50 bg-input-bg/40' : 'border-brand-black/20'
       }`}
     >
-      <span className="text-5xl">＋</span>
+      <img src={addDocument} alt="" className="size-32" />
       <p className="mt-4 text-3xl font-bold text-brand-black/25">
         Drop your documents here
       </p>
