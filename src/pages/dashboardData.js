@@ -1,82 +1,72 @@
+const application = (id, company, location, role, dueDate) => ({
+  id,
+  company,
+  location,
+  role,
+  dueDate,
+})
+
 export const INITIAL_COLUMNS = [
   {
     title: 'To apply',
     tone: 'bg-brand-blue',
     applications: [
-      {
-        id: 'atlassian-software-engineering',
-        company: 'Atlassian',
-        location: 'Sydney, AU',
-        role: 'Software Engineering Intern',
-        dueDate: '25 Jul',
-      },
+      application(
+        'atlassian-software-engineering',
+        'Atlassian',
+        'Sydney, AU',
+        'Software Engineering Intern',
+        '25 Jul',
+      ),
     ],
   },
   {
     title: 'Applied / Waiting',
     tone: 'bg-brand-pink',
     applications: [
-      {
-        id: 'xero-product-design',
-        company: 'Xero',
-        location: 'Wellington, NZ',
-        role: 'Product Design Intern',
-        dueDate: '18 Aug',
-      },
-      {
-        id: 'datacom-software-development',
-        company: 'Datacom',
-        location: 'Auckland, NZ',
-        role: 'Software Development Intern',
-        dueDate: '22 Aug',
-      },
+      application('xero-product-design', 'Xero', 'Wellington, NZ', 'Product Design Intern', '18 Aug'),
+      application(
+        'datacom-software-development',
+        'Datacom',
+        'Auckland, NZ',
+        'Software Development Intern',
+        '22 Aug',
+      ),
     ],
   },
   {
     title: 'Interview',
     tone: 'bg-brand-green',
     applications: [
-      {
-        id: 'canva-frontend-engineering',
-        company: 'Canva',
-        location: 'Sydney, AU',
-        role: 'Frontend Engineering Intern',
-        dueDate: '19 Aug',
-      },
-      {
-        id: 'air-new-zealand-data',
-        company: 'Air New Zealand',
-        location: 'Auckland, NZ',
-        role: 'Data Analyst Intern',
-        dueDate: '21 Aug',
-      },
-      {
-        id: 'serko-qa-engineering',
-        company: 'Serko',
-        location: 'Auckland, NZ',
-        role: 'QA Engineering Intern',
-        dueDate: '26 Aug',
-      },
+      application(
+        'canva-frontend-engineering',
+        'Canva',
+        'Sydney, AU',
+        'Frontend Engineering Intern',
+        '19 Aug',
+      ),
+      application(
+        'air-new-zealand-data',
+        'Air New Zealand',
+        'Auckland, NZ',
+        'Data Analyst Intern',
+        '21 Aug',
+      ),
+      application('serko-qa-engineering', 'Serko', 'Auckland, NZ', 'QA Engineering Intern', '26 Aug'),
     ],
   },
   {
     title: 'Offer',
     tone: 'bg-brand-yellow',
     applications: [
-      {
-        id: 'sharesies-software-engineering',
-        company: 'Sharesies',
-        location: 'Wellington, NZ',
-        role: 'Software Engineering Intern',
-        dueDate: '20 Aug',
-      },
-      {
-        id: 'trademe-web-development',
-        company: 'Trade Me',
-        location: 'Wellington, NZ',
-        role: 'Web Development Intern',
-        dueDate: '23 Aug',
-      },
+      application(
+        'sharesies-software-engineering',
+        'Sharesies',
+        'Wellington, NZ',
+        'Software Engineering Intern',
+        '20 Aug',
+      ),
+      application('trademe-web-development', 'Trade Me', 'Wellington, NZ', 'Web Development Intern', '23 Aug'),
     ],
   },
 ]
