@@ -68,7 +68,7 @@ function DashboardPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={(application) => {
           console.log(application)
-          // TODO: add to INITIAL_COLUMNS / whatever state holds your applications
+          // TODO: NEED TO ADD APPLICATION CARD WHEN USER CLICKS SUBMIT
           setIsModalOpen(false)
         }}
       />
