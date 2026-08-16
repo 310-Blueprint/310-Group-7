@@ -2,6 +2,7 @@ import { useState } from 'react'
 import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
+import Sidebar from '../components/Sidebar'
 import { INITIAL_DOCUMENTS } from './documentsData'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 w-31'
@@ -21,8 +22,7 @@ function DocumentsPage() {
   return (
     <main className="h-screen min-w-[75rem] overflow-hidden bg-brand-bg p-4 text-brand-black">
       <div className="mx-auto flex h-full max-w-[100rem] gap-5">
-        {/* Sidebar goes here — leaving blank for now */}
-        <div className="w-58 shrink-0" />
+        <Sidebar />
 
         <section className="relative isolate flex min-w-0 flex-1 flex-col pl-2">
           <header className="mb-7 flex items-start justify-between px-2 pt-9">
