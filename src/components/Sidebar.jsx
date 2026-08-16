@@ -46,8 +46,8 @@ function Sidebar() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-full px-4 py-3 text-base transition-colors hover:bg-white/10 ${
-                isActive ? 'bg-white text-brand-black' : 'text-white'
+              `flex items-center gap-3 rounded-full px-4 py-3 text-base ${
+                isActive ? 'bg-white text-brand-black' : 'text-white hover:bg-white/10'
               }`
             }
           >
