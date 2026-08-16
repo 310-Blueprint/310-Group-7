@@ -1,3 +1,5 @@
+import ApplicationCard from './ApplicationCard'
+
 function StatusColumn({ title, tone, applications }) {
   return (
     <section className={`${tone} flex min-h-0 flex-col rounded-[1.35rem] p-4`}>
@@ -14,6 +16,12 @@ function StatusColumn({ title, tone, applications }) {
           {applications.length}
         </span>
       </header>
+
+      <div className="space-y-3">
+        {applications.map((application) => (
+          <ApplicationCard key={application.id} {...application} />
+        ))}
+      </div>
     </section>
   )
 }
