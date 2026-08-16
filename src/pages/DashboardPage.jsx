@@ -1,6 +1,7 @@
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
+import Sidebar from '../components/Sidebar'
 import StatusColumn from '../components/StatusColumn'
 import { INITIAL_COLUMNS } from './dashboardData'
 
@@ -10,16 +11,7 @@ function DashboardPage() {
   return (
     <main className="h-screen min-w-[75rem] overflow-hidden bg-brand-bg p-4 text-brand-black">
       <div className="mx-auto flex h-full max-w-[100rem] gap-5">
-        <aside
-          className="w-58 shrink-0 rounded-[2.5rem] bg-brand-black px-7 py-9 text-white"
-        >
-          <div className="flex items-center gap-2">
-            <span className="grid size-7 place-items-center rounded-full bg-white">
-              <span className="size-3 rounded-full bg-input-bg" />
-            </span>
-            <span className="text-3xl font-bold">Pipeline</span>
-          </div>
-        </aside>
+        <Sidebar />
 
         <section className="relative isolate flex min-w-0 flex-1 flex-col pl-2">
           <header className="mb-7 flex items-start justify-between px-2 pt-9">
