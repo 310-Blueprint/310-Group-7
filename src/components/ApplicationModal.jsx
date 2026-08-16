@@ -32,7 +32,7 @@ export default function ApplicationModal ({isOpen, onClose, onSubmit}){
         <div className="relative z-20 flex items-center justify-center">
           <h2
             id="modal-title"
-            className="text-center text-5xl font-bold tracking-tight text-[#353434]"
+            className="text-center text-5xl font-bold tracking-tight text-application-modal-black"
           >
             ADD APPLICATION
           </h2>
@@ -42,7 +42,7 @@ export default function ApplicationModal ({isOpen, onClose, onSubmit}){
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
-          className="relative z-10 -mt-2 rounded-[28px] bg-[#353434] p-8 pt-16 pb-9 font-sans shadow-2xl"
+          className="relative z-10 -mt-2 rounded-[28px] bg-application-modal-black p-8 pt-16 pb-9 font-sans shadow-2xl"
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <label className="flex flex-col gap-2">
