@@ -1,13 +1,17 @@
+import { useState } from 'react'
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
 import Sidebar from '../components/Sidebar'
 import StatusColumn from '../components/StatusColumn'
+import ApplicationModal from '../components/ApplicationModal'
 import { INITIAL_COLUMNS } from './dashboardData'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 w-31'
 
 function DashboardPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   return (
     <main className="h-screen min-w-[75rem] overflow-hidden bg-brand-bg p-4 text-brand-black">
       <div className="mx-auto flex h-full max-w-[100rem] gap-5">
@@ -23,7 +27,8 @@ function DashboardPage() {
             </div>
             <button
               type="button"
-              className="cursor-default rounded-full bg-brand-black px-9 py-4 text-base text-white"
+              onClick={() => setIsModalOpen(true)}
+              className="rounded-full bg-brand-black px-9 py-4 text-base text-white"
             >
               + Add application
             </button>
@@ -57,6 +62,16 @@ function DashboardPage() {
           />
         </section>
       </div>
+
+      <ApplicationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={(application) => {
+          console.log(application)
+          // TODO: add to INITIAL_COLUMNS / whatever state holds your applications
+          setIsModalOpen(false)
+        }}
+      />
     </main>
   )
 }
