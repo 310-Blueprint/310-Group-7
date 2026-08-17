@@ -55,7 +55,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         <dialog
         ref={dialogRef}
         aria-labelledby="modal-title"
-        className="h-full max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-black/55"
+        className="h-full max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-white/55"
         >
         <div className="flex h-full w-full items-center justify-center p-6">
             <button
