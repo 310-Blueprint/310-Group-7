@@ -5,6 +5,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
     const [company, setCompany] = useState("");
     const [role, setRole] = useState("");
     const [dueDate, setDueDate] = useState("");
+    const [location, setLocation] = useState("");
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -35,6 +36,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         if (!company.trim()) newErrors.company = "Company is required";
         if (!role.trim()) newErrors.role = "Role is required";
         if (!dueDate) newErrors.dueDate = "Due date is required";
+        if(!location) newErrors.location = "Location is required";
         return newErrors;
     }
 
@@ -44,10 +46,12 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
-        onSubmit?.({ company: company.trim(), role: role.trim(), dueDate });
+        onSubmit?.({ company: company.trim(), location: location.trim(), role: role.trim(), dueDate });
         setCompany("");
+        setLocation(""); 
         setRole("");
         setDueDate("");
+        
         setErrors({});
     }
 
@@ -88,6 +92,20 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
                 />
                 {errors.company && (
                   <span className="px-2 text-sm text-red-300">{errors.company}</span>
+                )}
+                </label>
+
+                <label className="flex flex-col gap-2">
+                <span className="font-medium text-brand-bg">Location</span>
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="rounded-full bg-input-bg px-5 py-3.5 text-brand-black outline-none placeholder:text-input-placeholder focus-visible:ring-2 focus-visible:ring-brand-yellow"
+                />
+                {errors.location && (
+                  <span className="px-2 text-sm text-red-300">{errors.location}</span>
                 )}
                 </label>
 
