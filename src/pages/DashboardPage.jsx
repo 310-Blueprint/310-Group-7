@@ -7,20 +7,20 @@ import StatusColumn from '../components/StatusColumn'
 import ApplicationModal from '../components/ApplicationModal'
 import { INITIAL_COLUMNS } from './dashboardData'
 
-const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 w-31'
+const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
 
 function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
-    <main className="h-screen min-w-[75rem] overflow-hidden bg-brand-bg p-4 text-brand-black">
-      <div className="mx-auto flex h-full max-w-[100rem] gap-5">
+    <main className="min-h-screen bg-brand-bg p-3 text-brand-black sm:p-4">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[100rem] flex-col gap-4 sm:min-h-[calc(100vh-2rem)] md:flex-row md:gap-5">
         <Sidebar />
 
-        <section className="relative isolate flex min-w-0 flex-1 flex-col pl-2">
-          <header className="mb-7 flex items-start justify-between px-2 pt-9">
+        <section className="relative isolate flex min-w-0 flex-1 flex-col md:pl-2">
+          <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Hello, Stranger<span aria-hidden="true">✦</span>
               </h1>
               <p className="mt-1 text-base">Welcome to your internship dashboard</p>
@@ -28,7 +28,7 @@ function DashboardPage() {
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="rounded-full bg-brand-black px-9 py-4 text-base text-white"
+              className="w-full rounded-full bg-brand-black px-7 py-3.5 text-base text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto sm:px-9 sm:py-4"
             >
               + Add application
             </button>
@@ -41,7 +41,7 @@ function DashboardPage() {
             className={`${BEAVER_POSITION} z-0`}
           />
 
-          <div className="relative z-10 grid flex-1 grid-cols-4 gap-4 overflow-hidden">
+          <div className="relative z-10 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {INITIAL_COLUMNS.map((column) => (
               <StatusColumn key={column.title} {...column} />
             ))}
@@ -58,7 +58,7 @@ function DashboardPage() {
             src={grassDouble}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-2 right-[25%] z-20 w-44 translate-x-1/2 opacity-80"
+            className="pointer-events-none absolute -bottom-2 right-[25%] z-20 hidden w-44 translate-x-1/2 opacity-80 xl:block"
           />
         </section>
       </div>
@@ -68,7 +68,6 @@ function DashboardPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={(application) => {
           console.log(application)
-          // TODO: NEED TO ADD APPLICATION CARD WHEN USER CLICKS SUBMIT
           setIsModalOpen(false)
         }}
       />
