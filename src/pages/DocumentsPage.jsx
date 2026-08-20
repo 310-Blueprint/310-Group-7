@@ -32,12 +32,12 @@ function DocumentsPage() {
               </h1>
               <p className="mt-1 text-base">Welcome to your documents archive</p>
             </div>
-            <button
-              type="button"
-              className="cursor-default rounded-full bg-brand-black px-9 py-4 text-base text-white"
+            <label
+              htmlFor="document-upload-input"
+              className="cursor-pointer rounded-full bg-brand-black px-9 py-4 text-base text-white"
             >
               + Add document
-            </button>
+            </label>
           </header>
 
           <img src={beaver} alt="" aria-hidden="true" className={BEAVER_POSITION} />
