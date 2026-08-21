@@ -11,7 +11,16 @@ const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 w-31'
 
 function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [columns, setColumns] = useState(INITIAL_COLUMNS);
 
+  function handleAddApplication(application){
+    const newApplication = {
+      id: `${application.company}-${application.role}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-'),...application,
+    }
+
+    setColumns((prevColumns) => prevColumns.map((column) => column.title === 'To apply' ? { ...column, applications: [...column.applications, newApplication]} : column,),)
+    setIsModalOpen(false)
+  }
   return (
     <main className="h-screen min-w-[75rem] overflow-hidden bg-brand-bg p-4 text-brand-black">
       <div className="mx-auto flex h-full max-w-[100rem] gap-5">
@@ -42,7 +51,7 @@ function DashboardPage() {
           />
 
           <div className="relative z-10 grid flex-1 grid-cols-4 gap-4 overflow-hidden">
-            {INITIAL_COLUMNS.map((column) => (
+            {columns.map((column) => (
               <StatusColumn key={column.title} {...column} />
             ))}
           </div>
@@ -66,11 +75,8 @@ function DashboardPage() {
       <ApplicationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={(application) => {
-          console.log(application)
-          // TODO: NEED TO ADD APPLICATION CARD WHEN USER CLICKS SUBMIT
-          setIsModalOpen(false)
-        }}
+        onSubmit= {handleAddApplication}
+          
       />
     </main>
   )
