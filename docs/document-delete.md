@@ -1,8 +1,8 @@
-# Document Delete
+# Document Delete Changes
 
 ## Branch
 
-`feature/implement-document-delete`
+`feature/delete-documents`
 
 ## Summary
 
@@ -22,6 +22,12 @@ This branch adds delete support to the Documents page and connects deletion to S
 - Added a `handleDeleteDocument` function that removes the file from the `documents` Storage bucket before updating the visible document list.
 - Passed `handleDeleteDocument` down to each `DocumentCard` as `onDelete`.
 - Fixed the `id` assigned to files loaded from Supabase so it matches the file's Storage path rather than its internal Storage id, since deletion requires the path.
+- Removed the `documentsData.js` local seed data and its `useState(INITIAL_DOCUMENTS)` initial value, since it was only ever a placeholder shown briefly before the real Supabase fetch completed.
+- Added an `isLoading` state so the page shows a loading message while fetching, an empty-state message when there are no documents, and the document list once loaded — instead of flashing fake seed data on every page load.
+
+### `src/pages/documentsData.js`
+
+- Removed. No longer imported anywhere now that the page loads its initial state directly from Supabase.
 
 ## Supabase Setup
 
@@ -35,7 +41,7 @@ to public
 using (bucket_id = 'documents');
 ```
 
-This is in addition to the existing upload and listing policies.
+This is in addition to the existing upload and listing policies. Without a delete policy, delete requests do not return an error but also do not remove the file, so the file reappears after refresh.
 
 The anonymous delete policy is suitable only for temporary testing. Production use should require authenticated users and restrict deletion to each user's own files.
 
@@ -49,4 +55,3 @@ The anonymous delete policy is suitable only for temporary testing. Production u
 - Authentication is not connected yet, so the current delete policy allows anonymous access.
 - Delete is not scoped to individual users — any anonymous client can delete any file in the bucket.
 - There is no confirmation step before deleting, and no user-facing error message if a delete request fails.
-- The initial sample documents remain local seed data and cannot be deleted through this flow unless a matching file also exists in the bucket.
