@@ -15,28 +15,30 @@ function DocumentsPage() {
     async function loadDocuments() {
       const { data, error } = await supabase.storage
         .from('documents')
-        .list('', { sortBy: { column: 'name', order: 'desc' } })
-
+        .list('', { sortBy: { column: 'name', order: 'asc' } })
+  
       if (error) {
         console.error('Could not load documents:', error.message)
         return
       }
-
-      const storedDocuments = data.map((file) => {
-        const { data: publicUrl } = supabase.storage
-          .from('documents')
-          .getPublicUrl(file.name)
-
-        return {
-          id: file.id ?? file.name,
-          name: file.name.replace(/^\d+-/, ''),
-          url: publicUrl.publicUrl,
-        }
-      })
-
-      setDocuments((previous) => [...previous, ...storedDocuments])
+  
+      const storedDocuments = data
+        .filter((file) => file.name !== '.emptyFolderPlaceholder')
+        .map((file) => {
+          const { data: publicUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(file.name)
+  
+          return {
+            id: file.id ?? file.name,
+            name: file.name.replace(/^\d+-/, ''),
+            url: publicUrl.publicUrl,
+          }
+        })
+  
+      setDocuments(storedDocuments)
     }
-
+  
     loadDocuments()
   }, [])
 
@@ -44,7 +46,7 @@ function DocumentsPage() {
     const uploadedDocs = []
   
     for (const [index, file] of files.entries()) {
-      const filePath = `${Date.now()}-${index}-${file.name}`
+      const filePath = `${Date.now()}-${file.name}`
   
       const { error } = await supabase.storage
         .from('documents')
