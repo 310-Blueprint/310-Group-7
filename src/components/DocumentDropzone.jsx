@@ -4,11 +4,21 @@ import addDocument from '../assets/addDocument.png'
 function DocumentDropzone({ onFilesDropped }) {
   const [isDragging, setIsDragging] = useState(false)
 
+  const handleFilesSelected = useCallback(
+    (e) => {
+      onFilesDropped(Array.from(e.target.files))
+      e.target.value = ''
+    },
+    [onFilesDropped],
+  )
+
   const handleDrop = useCallback(
     (e) => {
       e.preventDefault()
       setIsDragging(false)
-      onFilesDropped(Array.from(e.dataTransfer.files))
+      if (e.dataTransfer.files.length > 0) {
+        onFilesDropped(Array.from(e.dataTransfer.files))
+      }
     },
     [onFilesDropped],
   )
@@ -25,10 +35,23 @@ function DocumentDropzone({ onFilesDropped }) {
         isDragging ? 'border-brand-black/50 bg-input-bg/40' : 'border-brand-black/20'
       }`}
     >
-      <img src={addDocument} alt="" className="size-20 sm:size-28 lg:size-32" />
-      <p className="mt-4 text-xl font-bold text-brand-black/25 sm:text-2xl lg:text-3xl">
-        Drop your documents here
-      </p>
+      <input
+        id="document-upload-input"
+        type="file"
+        multiple
+        onChange={handleFilesSelected}
+        className="sr-only"
+      />
+      <label
+        htmlFor="document-upload-input"
+        className="flex cursor-pointer flex-col items-center"
+      >
+        <img src={addDocument} alt="Choose documents to upload" className="size-20 sm:size-28 lg:size-32" />
+        <span className="mt-4 text-center text-xl font-bold text-brand-black/25 sm:text-2xl lg:text-3xl">
+          Drop your documents here
+        </span>
+        <span className="mt-2 text-base text-brand-black/50">or browse your laptop</span>
+      </label>
     </div>
   )
 }

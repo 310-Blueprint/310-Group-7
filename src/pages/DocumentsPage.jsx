@@ -1,22 +1,74 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import Sidebar from '../components/Sidebar'
 import { INITIAL_DOCUMENTS } from './documentsData'
+import { supabase } from '../lib/supabaseClient'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
 
 function DocumentsPage() {
   const [documents, setDocuments] = useState(INITIAL_DOCUMENTS)
 
-  function handleFilesDropped(files) {
-    const newDocs = files.map((file, i) => ({
-      id: Date.now() + i,
-      name: file.name,
-      url: URL.createObjectURL(file),
-    }))
-    setDocuments((prev) => [...prev, ...newDocs])
+  useEffect(() => {
+    async function loadDocuments() {
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .list('', { sortBy: { column: 'name', order: 'asc' } })
+
+      if (error) {
+        console.error('Could not load documents:', error.message)
+        return
+      }
+
+      const storedDocuments = data
+        .filter((file) => file.name !== '.emptyFolderPlaceholder')
+        .map((file) => {
+          const { data: publicUrl } = supabase.storage
+            .from('documents')
+            .getPublicUrl(file.name)
+
+          return {
+            id: file.id ?? file.name,
+            name: file.name.replace(/^\d+(?:-\d+)?-/, ''),
+            url: publicUrl.publicUrl,
+          }
+        })
+
+      setDocuments(storedDocuments)
+    }
+
+    loadDocuments()
+  }, [])
+
+  async function handleFilesDropped(files) {
+    const uploadedDocs = []
+
+    for (const [index, file] of files.entries()) {
+      const filePath = `${Date.now()}-${index}-${file.name}`
+
+      const { error } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file)
+
+      if (error) {
+        console.error('Upload failed:', error.message)
+        continue
+      }
+
+      const { data } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath)
+
+      uploadedDocs.push({
+        id: filePath,
+        name: file.name,
+        url: data.publicUrl,
+      })
+    }
+
+    setDocuments((previous) => [...previous, ...uploadedDocs])
   }
 
   return (
@@ -32,12 +84,12 @@ function DocumentsPage() {
               </h1>
               <p className="mt-1 text-base">Welcome to your documents archive</p>
             </div>
-            <button
-              type="button"
-              className="w-full cursor-default rounded-full bg-brand-black px-7 py-3.5 text-base text-white sm:w-auto sm:px-9 sm:py-4"
+            <label
+              htmlFor="document-upload-input"
+              className="cursor-pointer rounded-full bg-brand-black px-7 py-3.5 text-base text-white sm:w-auto sm:px-9 sm:py-4"
             >
               + Add document
-            </button>
+            </label>
           </header>
 
           <img src={beaver} alt="" aria-hidden="true" className={BEAVER_POSITION} />
