@@ -31,7 +31,7 @@ function DocumentsPage() {
   
           return {
             id: file.id ?? file.name,
-            name: file.name.replace(/^\d+-/, ''),
+            name: file.name.replace(/^\d+(?:-\d+)?-/, ''),
             url: publicUrl.publicUrl,
           }
         })
@@ -46,7 +46,7 @@ function DocumentsPage() {
     const uploadedDocs = []
   
     for (const [index, file] of files.entries()) {
-      const filePath = `${Date.now()}-${file.name}`
+      const filePath = `${Date.now()}-${index}-${file.name}`
   
       const { error } = await supabase.storage
         .from('documents')
