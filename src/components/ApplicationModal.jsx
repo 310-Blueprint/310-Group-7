@@ -1,5 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 
+
+function capitaliseWords(text){
+      return text.trim().split(" ").filter(Boolean).map((word) => {
+        const bare = word.replace(/[^a-zA-Z]/g, "");
+
+        if (bare.length === 2){
+          return word.toUpperCase(); 
+        }
+
+        const lower = word.toLowerCase(); 
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      })
+      .join(" ");
+    }
+    
 export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
     const dialogRef = useRef(null);
     const [company, setCompany] = useState("");
@@ -35,7 +50,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         const newErrors = {};
         if (!company.trim()) newErrors.company = "Company is required";
         if (!role.trim()) newErrors.role = "Role is required";
-        if (!dueDate) newErrors.dueDate = "Due date is required";
+        if (!dueDate) newErrors.dueDate = "Due Date is required";
         if(!location) newErrors.location = "Location is required";
         return newErrors;
     }
@@ -46,7 +61,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
-        onSubmit?.({ company: company.trim(), location: location.trim(), role: role.trim(), dueDate });
+        onSubmit?.({ company: company.trim(), location: capitaliseWords(location), role: role.trim(), dueDate });
         setCompany("");
         setLocation(""); 
         setRole("");
@@ -54,6 +69,8 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         
         setErrors({});
     }
+
+    
 
     return (
         <dialog
@@ -82,10 +99,10 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
             <div className="relative z-10 -mt-2 rounded-[28px] bg-[#353434] p-8 pt-16 pb-9 font-sans shadow-2xl">
                 <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
                 <label className="flex flex-col gap-2">
-                <span className="font-medium text-brand-bg">Company</span>
+                <span className="font-medium text-brand-bg">Company *</span>
                 <input
                   type="text"
-                  placeholder="Company name"
+                  placeholder="Company Name"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   className="rounded-full bg-input-bg px-5 py-3.5 text-brand-black outline-none placeholder:text-input-placeholder focus-visible:ring-2 focus-visible:ring-brand-yellow"
@@ -96,10 +113,10 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                <span className="font-medium text-brand-bg">Location</span>
+                <span className="font-medium text-brand-bg">Location *</span>
                 <input
                   type="text"
-                  placeholder="Location"
+                  placeholder="City, Country Code"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="rounded-full bg-input-bg px-5 py-3.5 text-brand-black outline-none placeholder:text-input-placeholder focus-visible:ring-2 focus-visible:ring-brand-yellow"
@@ -110,7 +127,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                <span className="font-medium text-brand-bg">Role</span>
+                <span className="font-medium text-brand-bg">Role *</span>
                 <input
                   type="text"
                   placeholder="Role"
@@ -124,7 +141,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
                 </label>
 
                 <label className="flex flex-col gap-2">
-                <span className="font-medium text-brand-bg">Due date</span>
+                <span className="font-medium text-brand-bg">Due Date *</span>
                 <input
                   type="date"
                   value={dueDate}
