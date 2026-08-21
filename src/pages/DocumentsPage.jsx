@@ -1,22 +1,72 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import Sidebar from '../components/Sidebar'
 import { INITIAL_DOCUMENTS } from './documentsData'
+import { supabase } from '../lib/supabaseClient'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 w-31'
 
 function DocumentsPage() {
   const [documents, setDocuments] = useState(INITIAL_DOCUMENTS)
 
-  function handleFilesDropped(files) {
-    const newDocs = files.map((file, i) => ({
-      id: Date.now() + i,
-      name: file.name,
-      url: URL.createObjectURL(file),
-    }))
-    setDocuments((prev) => [...prev, ...newDocs])
+  useEffect(() => {
+    async function loadDocuments() {
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .list('', { sortBy: { column: 'name', order: 'desc' } })
+
+      if (error) {
+        console.error('Could not load documents:', error.message)
+        return
+      }
+
+      const storedDocuments = data.map((file) => {
+        const { data: publicUrl } = supabase.storage
+          .from('documents')
+          .getPublicUrl(file.name)
+
+        return {
+          id: file.id ?? file.name,
+          name: file.name.replace(/^\d+-/, ''),
+          url: publicUrl.publicUrl,
+        }
+      })
+
+      setDocuments((previous) => [...previous, ...storedDocuments])
+    }
+
+    loadDocuments()
+  }, [])
+
+  async function handleFilesDropped(files) {
+    const uploadedDocs = []
+  
+    for (const [index, file] of files.entries()) {
+      const filePath = `${Date.now()}-${index}-${file.name}`
+  
+      const { error } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file)
+  
+      if (error) {
+        console.error('Upload failed:', error.message)
+        continue
+      }
+  
+      const { data } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath)
+  
+      uploadedDocs.push({
+        id: filePath,
+        name: file.name,
+        url: data.publicUrl,
+      })
+    }
+  
+    setDocuments((previous) => [...previous, ...uploadedDocs])
   }
 
   return (
