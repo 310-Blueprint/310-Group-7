@@ -35,7 +35,6 @@ function DocumentDropzone({ onFilesDropped }) {
         isDragging ? 'border-brand-black/50 bg-input-bg/40' : 'border-brand-black/20'
       }`}
     >
-<<<<<<< HEAD
       <input
         id="document-upload-input"
         type="file"
@@ -47,18 +46,12 @@ function DocumentDropzone({ onFilesDropped }) {
         htmlFor="document-upload-input"
         className="flex cursor-pointer flex-col items-center"
       >
-        <img src={addDocument} alt="Choose documents to upload" className="size-32" />
-        <span className="mt-4 text-center text-3xl font-bold text-brand-black/25">
+        <img src={addDocument} alt="Choose documents to upload" className="size-20 sm:size-28 lg:size-32" />
+        <span className="mt-4 text-center text-xl font-bold text-brand-black/25 sm:text-2xl lg:text-3xl">
           Drop your documents here
         </span>
         <span className="mt-2 text-base text-brand-black/50">or browse your laptop</span>
       </label>
-=======
-      <img src={addDocument} alt="" className="size-20 sm:size-28 lg:size-32" />
-      <p className="mt-4 text-xl font-bold text-brand-black/25 sm:text-2xl lg:text-3xl">
-        Drop your documents here
-      </p>
->>>>>>> upstream/main
     </div>
   )
 }
