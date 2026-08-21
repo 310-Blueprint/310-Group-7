@@ -2,7 +2,7 @@
 
 ## Summary
 
-A desktop-only documents archive page has been added based on the supplied design mockup. It uses the same Tailwind theme and decorative artwork as the existing dashboard and authentication pages.
+A responsive documents archive page has been added based on the supplied design mockup. It uses the same Tailwind theme and decorative artwork as the existing dashboard and authentication pages.
 
 ## New files
 
@@ -33,7 +33,9 @@ A desktop-only documents archive page has been added based on the supplied desig
 
 ## Styling
 
-- The documents page intentionally supports desktop layouts only, matching the dashboard's minimum-width approach.
+- The documents page uses a stacked mobile layout and a sidebar layout on desktop.
+- Document rows truncate long filenames to prevent horizontal overflow.
+- The documents panel, drop zone, icons, and text use responsive spacing and sizing.
 - The documents panel uses the shared `bg-brand-blue` theme token, matching the "To apply" column colour on the dashboard rather than a one-off hex value.
 
 ## Remaining work

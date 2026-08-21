@@ -94,7 +94,7 @@ everywhere without a `font-sans` class.
   loading state on the button. Sign up does not check that the two passwords
   match.
 - The logo is a `<p>Pipeline</p>` placeholder pending the real asset.
-- No responsive pass. The card's `px-22` and the beaver both need attention at
-  narrow widths.
+- Responsive spacing, fluid headings, full-width mobile actions, wrapping footer text,
+  and scaled decorative artwork are implemented for narrow widths.
 - `beaver.png` is ~666 KB and `beaverArms.png` ~209 KB, most of the bundle.
   They should be re-exported as SVG like the grass.
