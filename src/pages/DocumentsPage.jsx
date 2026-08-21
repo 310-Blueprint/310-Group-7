@@ -30,7 +30,7 @@ function DocumentsPage() {
             .getPublicUrl(file.name)
 
           return {
-            id: file.id ?? file.name,
+            id: file.name,
             name: file.name.replace(/^\d+(?:-\d+)?-/, ''),
             url: publicUrl.publicUrl,
           }
@@ -71,6 +71,17 @@ function DocumentsPage() {
     setDocuments((previous) => [...previous, ...uploadedDocs])
   }
 
+  async function handleDeleteDocument(id) {
+    const { error } = await supabase.storage.from('documents').remove([id])
+
+    if (error) {
+      console.error('Delete failed:', error.message)
+      return
+    }
+
+    setDocuments((previous) => previous.filter((doc) => doc.id !== id))
+  }
+
   return (
     <main className="min-h-screen bg-brand-bg p-3 text-brand-black sm:p-4">
       <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[100rem] flex-col gap-4 sm:min-h-[calc(100vh-2rem)] md:flex-row md:gap-5">
@@ -99,7 +110,7 @@ function DocumentsPage() {
               <h2 className="mb-4 text-lg font-semibold">Documents</h2>
               <div className="flex flex-col gap-3">
                 {documents.map((doc) => (
-                  <DocumentCard key={doc.id} {...doc} />
+                  <DocumentCard key={doc.id} {...doc} onDelete={handleDeleteDocument} />
                 ))}
               </div>
             </div>
