@@ -3,13 +3,13 @@ import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import Sidebar from '../components/Sidebar'
-import { INITIAL_DOCUMENTS } from './documentsData'
 import { supabase } from '../lib/supabaseClient'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
 
 function DocumentsPage() {
-  const [documents, setDocuments] = useState(INITIAL_DOCUMENTS)
+  const [documents, setDocuments] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function loadDocuments() {
@@ -19,6 +19,7 @@ function DocumentsPage() {
 
       if (error) {
         console.error('Could not load documents:', error.message)
+        setIsLoading(false)
         return
       }
 
@@ -30,13 +31,14 @@ function DocumentsPage() {
             .getPublicUrl(file.name)
 
           return {
-            id: file.id ?? file.name,
+            id: file.name,
             name: file.name.replace(/^\d+(?:-\d+)?-/, ''),
             url: publicUrl.publicUrl,
           }
         })
 
       setDocuments(storedDocuments)
+      setIsLoading(false)
     }
 
     loadDocuments()
@@ -71,6 +73,17 @@ function DocumentsPage() {
     setDocuments((previous) => [...previous, ...uploadedDocs])
   }
 
+  async function handleDeleteDocument(id) {
+    const { error } = await supabase.storage.from('documents').remove([id])
+
+    if (error) {
+      console.error('Delete failed:', error.message)
+      return
+    }
+
+    setDocuments((previous) => previous.filter((doc) => doc.id !== id))
+  }
+
   return (
     <main className="min-h-screen bg-brand-bg p-3 text-brand-black sm:p-4">
       <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[100rem] flex-col gap-4 sm:min-h-[calc(100vh-2rem)] md:flex-row md:gap-5">
@@ -97,11 +110,18 @@ function DocumentsPage() {
           <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4">
             <div className="rounded-[1.75rem] bg-brand-blue p-4 sm:rounded-[2.5rem] sm:p-6">
               <h2 className="mb-4 text-lg font-semibold">Documents</h2>
-              <div className="flex flex-col gap-3">
-                {documents.map((doc) => (
-                  <DocumentCard key={doc.id} {...doc} />
-                ))}
-              </div>
+
+              {isLoading ? (
+                <p className="text-brand-black/50">Loading documents…</p>
+              ) : documents.length === 0 ? (
+                <p className="text-brand-black/50">No documents yet.</p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {documents.map((doc) => (
+                    <DocumentCard key={doc.id} {...doc} onDelete={handleDeleteDocument} />
+                  ))}
+                </div>
+              )}
             </div>
 
             <Dropzone onFilesDropped={handleFilesDropped} />
