@@ -14,7 +14,7 @@ function AuthButton({ children, className = 'mb-5 sm:mx-12 md:mx-20', ...buttonP
       <button
         type="submit"
         {...buttonProps}
-        className="w-full cursor-pointer rounded-xl bg-brand-yellow p-2.5 font-bold transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
+        className="w-full cursor-pointer rounded-xl bg-brand-yellow p-2.5 font-bold transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black disabled:cursor-not-allowed disabled:opacity-60"
       >
         {children}
       </button>

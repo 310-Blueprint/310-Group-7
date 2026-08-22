@@ -24,7 +24,7 @@ This branch adds document upload support to the Documents page and connects uplo
 - Uploads selected or dropped files to the `documents` Storage bucket.
 - Generates a unique Storage path for each uploaded file.
 - Adds successfully uploaded files to the visible document list.
-- Uses Supabase public URLs for document downloads.
+- Uses signed URLs for document downloads (superseded — see the note below).
 - Loads existing files from the `documents` bucket when the page opens.
 - Removes the generated numeric prefix from filenames displayed in the interface.
 - Changed the `+ Add document` control to open the file picker.
@@ -38,25 +38,31 @@ VITE_SUPABASE_URL=your-project-url
 VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
-Supabase must contain a Storage bucket named `documents`. The bucket is currently public so the generated public download URLs work.
+Supabase must contain a Storage bucket named `documents`.
 
-For the current anonymous testing setup, Storage policies must allow both uploading and listing files:
+> **Superseded by authentication.** This section described a *public* bucket with
+> *anonymous* policies, which was only ever a temporary testing setup. Since
+> authentication landed the bucket is **private** and files are scoped per user.
+> See [authentication.md](authentication.md) for the current arrangement; the
+> policies below are the ones now in `schema.sql`:
 
 ```sql
-create policy "Allow file uploads"
-on storage.objects
-for insert
-to anon
-with check (bucket_id = 'documents');
-
-create policy "Allow listing"
-on storage.objects
-for select
-to anon
-using (bucket_id = 'documents');
+create policy "Users manage own files"
+  on storage.objects for all
+  to authenticated
+  using (
+    bucket_id = 'documents'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  )
+  with check (
+    bucket_id = 'documents'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
 ```
 
-The anonymous policies are suitable only for temporary testing. Production use should require authenticated users and restrict access to each user's own files.
+Files uploaded under the old anonymous scheme sat at the bucket root with no
+user folder. The new policy checks the first path segment, so those objects are
+unreachable from the app and were deleted from the Supabase dashboard.
 
 ## Verification
 
@@ -66,7 +72,13 @@ The anonymous policies are suitable only for temporary testing. Production use s
 
 ## Current Limitations
 
-- Authentication is not connected yet, so the current Storage policies allow anonymous access.
-- The bucket contents are listed from the root directory and are not associated with individual users.
-- The initial sample documents remain local seed data and are not stored in Supabase.
-- There is no upload progress indicator or user-facing upload error message yet.
+Most of the original limitations here were resolved by the authentication work:
+the bucket is private, files are namespaced per user, the local seed data is
+gone, and failed uploads now surface a message instead of only a console line.
+
+What remains:
+
+- No upload progress indicator.
+- Signed download URLs are minted when the page loads and expire after an hour,
+  so a tab left open longer has dead links until it is refreshed.
+- No way to delete or rename a document from the interface.

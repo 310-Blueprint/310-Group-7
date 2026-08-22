@@ -2,53 +2,119 @@ import { useEffect, useState } from 'react'
 import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
+import FormMessage from '../components/FormMessage'
 import Sidebar from '../components/Sidebar'
+import useAuth from '../context/useAuth'
 import { supabase } from '../lib/supabaseClient'
 
 const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
 
+// How long a download link stays valid. The bucket is private, so every URL is
+// signed. Known limitation: links are minted when the page loads, so a tab left
+// open longer than this has dead links until it's refreshed.
+const SIGNED_URL_TTL_SECONDS = 60 * 60
+
+// Files are stored as "<user id>/<uuid>-<original name>". The uuid keeps two
+// uploads of the same filename apart; this strips it back off for display.
+// Anchored to the uuid shape so a real filename like "2024-cv.pdf" survives.
+const STORED_NAME_PREFIX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i
+
+function toDisplayName(storedName) {
+  return storedName.replace(STORED_NAME_PREFIX, '')
+}
+
 function DocumentsPage() {
+  const { user } = useAuth()
   const [documents, setDocuments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
+    if (!user) return
+
+    // StrictMode double-invokes this in development and there are two awaits
+    // below, so a torn-down run could otherwise write state after unmounting.
+    let active = true
+
     async function loadDocuments() {
+      // Only this user's folder. The storage policy checks the first path
+      // segment against auth.uid(), so anything else is unreadable anyway.
       const { data, error } = await supabase.storage
         .from('documents')
-        .list('', { sortBy: { column: 'name', order: 'asc' } })
+        .list(user.id, { sortBy: { column: 'name', order: 'asc' } })
+
+      if (!active) return
 
       if (error) {
         console.error('Could not load documents:', error.message)
+        setErrorMessage('Could not load your documents. Try refreshing.')
         setIsLoading(false)
         return
       }
 
-      const storedDocuments = data
-        .filter((file) => file.name !== '.emptyFolderPlaceholder')
-        .map((file) => {
-          const { data: publicUrl } = supabase.storage
-            .from('documents')
-            .getPublicUrl(file.name)
+      // Supabase drops this marker into a folder that would otherwise be empty.
+      const files = data.filter((file) => file.name !== '.emptyFolderPlaceholder')
 
-          return {
-            id: file.name,
-            name: file.name.replace(/^\d+(?:-\d+)?-/, ''),
-            url: publicUrl.publicUrl,
-          }
-        })
+      if (files.length === 0) {
+        setDocuments([])
+        setIsLoading(false)
+        return
+      }
 
-      setDocuments(storedDocuments)
+      const paths = files.map((file) => `${user.id}/${file.name}`)
+
+      // One request for the whole page rather than one per file. `download`
+      // makes Supabase send Content-Disposition: attachment, which is what
+      // actually makes DocumentCard's <a download> work — browsers ignore that
+      // attribute on cross-origin links.
+      const { data: signed, error: signedError } = await supabase.storage
+        .from('documents')
+        .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS, { download: true })
+
+      if (!active) return
+
+      if (signedError) {
+        console.error('Could not sign documents:', signedError.message)
+        setErrorMessage('Could not load your documents. Try refreshing.')
+        setIsLoading(false)
+        return
+      }
+
+      // Keyed by path, not zipped by index — the response order isn't
+      // guaranteed to match the request, and zipping would pair names with the
+      // wrong URLs without ever erroring.
+      const urlByPath = new Map(signed.map((item) => [item.path, item.signedUrl]))
+
+      // id is the full storage path, which is what remove() needs and what
+      // keeps it unique across users.
+      setDocuments(
+        files.map((file) => ({
+          id: `${user.id}/${file.name}`,
+          name: toDisplayName(file.name),
+          url: urlByPath.get(`${user.id}/${file.name}`) ?? '',
+        })),
+      )
       setIsLoading(false)
     }
 
     loadDocuments()
-  }, [])
+
+    return () => {
+      active = false
+    }
+  }, [user])
 
   async function handleFilesDropped(files) {
-    const uploadedDocs = []
+    setErrorMessage('')
 
-    for (const [index, file] of files.entries()) {
-      const filePath = `${Date.now()}-${index}-${file.name}`
+    const uploadedDocs = []
+    const failedNames = []
+
+    for (const file of files) {
+      // The "<user id>/" prefix is mandatory — it is the only thing the storage
+      // policy checks. Uploading to the bucket root is rejected outright.
+      const filePath = `${user.id}/${crypto.randomUUID()}-${file.name}`
 
       const { error } = await supabase.storage
         .from('documents')
@@ -56,28 +122,45 @@ function DocumentsPage() {
 
       if (error) {
         console.error('Upload failed:', error.message)
+        failedNames.push(file.name)
         continue
       }
 
-      const { data } = supabase.storage
+      const { data, error: signedError } = await supabase.storage
         .from('documents')
-        .getPublicUrl(filePath)
+        .createSignedUrl(filePath, SIGNED_URL_TTL_SECONDS, { download: true })
+
+      if (signedError) {
+        console.error('Could not sign upload:', signedError.message)
+        failedNames.push(file.name)
+        continue
+      }
 
       uploadedDocs.push({
         id: filePath,
         name: file.name,
-        url: data.publicUrl,
+        url: data.signedUrl,
       })
+    }
+
+    if (failedNames.length > 0) {
+      setErrorMessage(`Could not upload ${failedNames.join(', ')}.`)
     }
 
     setDocuments((previous) => [...previous, ...uploadedDocs])
   }
 
   async function handleDeleteDocument(id) {
+    setErrorMessage('')
+
+    // `id` is the full "<user id>/<stored name>" path. The storage policy
+    // rejects anything outside the signed-in user's folder, so this cannot
+    // delete someone else's file even if the id were tampered with.
     const { error } = await supabase.storage.from('documents').remove([id])
 
     if (error) {
       console.error('Delete failed:', error.message)
+      setErrorMessage('Could not delete that document.')
       return
     }
 
@@ -111,14 +194,24 @@ function DocumentsPage() {
             <div className="rounded-[1.75rem] bg-brand-blue p-4 sm:rounded-[2.5rem] sm:p-6">
               <h2 className="mb-4 text-lg font-semibold">Documents</h2>
 
-              {isLoading ? (
-                <p className="text-brand-black/50">Loading documents…</p>
-              ) : documents.length === 0 ? (
-                <p className="text-brand-black/50">No documents yet.</p>
-              ) : (
+              {errorMessage && <FormMessage>{errorMessage}</FormMessage>}
+
+              {isLoading && <p className="text-sm">Loading your documents…</p>}
+
+              {!isLoading && documents.length === 0 && (
+                <p className="text-sm">
+                  No documents yet — drop a file below to get started.
+                </p>
+              )}
+
+              {documents.length > 0 && (
                 <div className="flex flex-col gap-3">
                   {documents.map((doc) => (
-                    <DocumentCard key={doc.id} {...doc} onDelete={handleDeleteDocument} />
+                    <DocumentCard
+                      key={doc.id}
+                      {...doc}
+                      onDelete={handleDeleteDocument}
+                    />
                   ))}
                 </div>
               )}

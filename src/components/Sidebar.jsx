@@ -1,4 +1,6 @@
 import { NavLink } from 'react-router-dom'
+import Logo from './Logo'
+import { supabase } from '../lib/supabaseClient'
 
 const NAV_ITEMS = [
   {
@@ -30,15 +32,18 @@ const NAV_ITEMS = [
   },
 ]
 
+// Shared by the nav links and the sign out button so they stay identical.
+const PILL_CLASSES =
+  'flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors sm:px-4 md:gap-3 md:py-3 md:text-base'
+
 function Sidebar() {
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+  }
+
   return (
     <aside className="flex w-full shrink-0 items-center justify-between gap-4 rounded-[1.75rem] bg-brand-black px-5 py-4 text-white md:w-52 md:flex-col md:items-stretch md:justify-start md:rounded-[2.5rem] md:px-5 md:py-8 lg:w-58 lg:px-7 lg:py-9">
-      <div className="flex items-center gap-2">
-        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white">
-          <span className="size-3 rounded-full bg-input-bg" />
-        </span>
-        <span className="text-xl font-bold sm:text-2xl lg:text-3xl">Pipeline</span>
-      </div>
+      <Logo className="text-xl sm:text-2xl lg:text-3xl" />
 
       <nav className="flex gap-1 md:mt-10 md:flex-col">
         {NAV_ITEMS.map(({ label, to, icon }) => (
@@ -46,7 +51,7 @@ function Sidebar() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors sm:px-4 md:gap-3 md:py-3 md:text-base ${
+              `${PILL_CLASSES} ${
                 isActive ? 'bg-white text-brand-black' : 'text-white hover:bg-white/10'
               }`
             }
@@ -56,6 +61,31 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Signing out clears the session, which makes ProtectedRoute redirect to
+          the login page on its own — no navigate() call needed here. */}
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className={`${PILL_CLASSES} cursor-pointer text-white hover:bg-white/10 md:mt-auto`}
+      >
+        <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+          <path
+            d="M15 4.5h2.5A1.5 1.5 0 0 1 19 6v12a1.5 1.5 0 0 1-1.5 1.5H15"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M10 8.5 6.5 12 10 15.5M6.5 12H15"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="hidden sm:inline">Sign out</span>
+      </button>
     </aside>
   )
 }
