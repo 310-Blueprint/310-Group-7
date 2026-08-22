@@ -11,7 +11,16 @@ const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w
 
 function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [columns, setColumns] = useState(INITIAL_COLUMNS);
 
+  function handleAddApplication(application){
+    const newApplication = {
+      id: `${application.company}-${application.role}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-'),...application,
+    }
+
+    setColumns((prevColumns) => prevColumns.map((column) => column.title === 'To apply' ? { ...column, applications: [...column.applications, newApplication]} : column,),)
+    setIsModalOpen(false)
+  }
   return (
     <main className="min-h-screen bg-brand-bg p-3 text-brand-black sm:p-4">
       <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[100rem] flex-col gap-4 sm:min-h-[calc(100vh-2rem)] md:flex-row md:gap-5">
@@ -41,8 +50,8 @@ function DashboardPage() {
             className={`${BEAVER_POSITION} z-0`}
           />
 
-          <div className="relative z-10 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {INITIAL_COLUMNS.map((column) => (
+          <div className="relative z-10 grid flex-1 grid-cols-4 gap-4 overflow-hidden">
+            {columns.map((column) => (
               <StatusColumn key={column.title} {...column} />
             ))}
           </div>
@@ -66,10 +75,8 @@ function DashboardPage() {
       <ApplicationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={(application) => {
-          console.log(application)
-          setIsModalOpen(false)
-        }}
+        onSubmit= {handleAddApplication}
+          
       />
     </main>
   )
