@@ -7,6 +7,7 @@
  * Layering (this is the fiddly part — see the z-index comments below):
  *   heading  z-auto ─ beaver body  z-0 ─ card  z-10 ─ grass + beaver arms  z-20
  */
+import Logo from './Logo'
 import grassSingle from '../assets/grassSingle.svg'
 import grassDouble from '../assets/grassDouble.svg'
 import beaver from '../assets/beaver.png'
@@ -20,11 +21,8 @@ const BEAVER_POSITION = 'pointer-events-none absolute -top-5 right-1 w-20 sm:-to
 function AuthCard({ title, children }) {
   return (
     <main className="relative grid min-h-screen place-items-center overflow-hidden bg-brand-black px-3 py-20 text-brand-bg sm:px-4 sm:py-16">
-      {/*Logo placeholder
-      TODO:Replace with logo asset after merge
-      */}
       <div className="absolute left-5 top-5 sm:left-6 sm:top-6">
-        <p className="text-sm font-semibold sm:text-base">Pipeline</p>
+        <Logo className="text-base sm:text-lg" markClassName="size-5 sm:size-6" />
       </div>
 
       <div className="relative w-full max-w-xl">
