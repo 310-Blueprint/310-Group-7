@@ -187,8 +187,11 @@ There are no automated tests. Alongside `npm run lint`, `npm run build`, and
 
 ## Future work
 
-- `beaver.png` (around 666 KB) and `beaverArms.png` (around 209 KB) are most of
-  the bundle and should be re-exported as SVG, like the grass already is.
+- `beaver.png` (651 KB) and `beaverArms.png` (205 KB) are most of the bundle and
+  should be re-exported as SVG, like the grass already is.
+- `src/assets/leaf1.png`, `leaf2.png`, and `logo.png` are imported nowhere. They
+  do not reach the bundle, but they are around 500 KB of dead weight in the
+  repository.
 - `public/favicon.svg` is no longer referenced and should be removed.
 - `src/App.css` is tracked but imported nowhere.
 
