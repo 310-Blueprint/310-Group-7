@@ -1,158 +1,200 @@
-# Pipeline — Internship Application Tracker
+# Pipeline
 
-Pipeline is a web app that helps students manage their internship applications in one place — tracking progress, organizing key documents, and streamlining the whole application process.
+An internship application tracker for students. Pipeline keeps application
+progress and the documents that go with it in one place, so the whole process is
+faster and less repetitive.
 
-## Why Pipeline?
+Built by **Team Blueprint** for **SOFTENG 310: Software Evolution and
+Maintenance** at the University of Auckland.
 
-There aren't many well-known platforms that let students easily or intuitively manage their internship applications. Spreadsheet options exist, but they're time-consuming to set up, unappealing, confusing to navigate, and often demotivating to look at. As students, we've also found that tailoring cover letters and CVs for each application is tiresome and repetitive.
+## Why Pipeline
 
-Pipeline solves this by tracking internship progress **and** collating important documents into a single location — making the application process faster and smoother.
+There are not many well-known platforms that let students manage internship
+applications easily or intuitively. Spreadsheets exist, but they are
+time-consuming to set up, unappealing, confusing to navigate, and often
+demotivating to look at. Tailoring cover letters and CVs for each application is
+tiresome and repetitive on top of that.
+
+Pipeline tracks internship progress **and** collates the important documents into
+a single place.
 
 ## Features
 
-### Core Features
-- **User Authentication** — secure sign-up and login
-- **Document Management** — store resumes (tailored per role), cover letters, and transcripts
-- **Application Status Tracking** — kanban board view (In Progress, Accepted, Rejected)
+### Working today
 
-### Planned Features
-- **Interview Calendar** — schedule and track upcoming interviews
-- **Task Management** — keep on top of application-related to-dos
-- **Notifications/Reminders** — never miss a deadline
-- **Job Search & Filtering** — find relevant internships
-- **Job Analytics** — insights into your application progress
-- **Saved Internships** — bookmark roles to apply to later
-- **AI Cover Letter / CV Tailorer** — automatically tailor documents per application
+- **User authentication.** Sign up, log in, and password reset by email, with
+  protected routes and per-user data isolation.
+- **Application tracking.** A kanban board with four stages (To apply, Applied /
+  Waiting, Interview, Offer). Cards are dragged to reorder them or to change
+  stage, and the board is saved to the database so it persists across devices.
+- **Document management.** Upload CVs, cover letters, and transcripts by drag and
+  drop or a file picker, then download or delete them. Files are stored
+  privately, scoped to the account that uploaded them.
 
-## Tech Stack
+### Planned for the next iteration
 
-- **Frontend:** React + Vite
-- **Styling:** TailwindCSS
-- **Backend / database:** Supabase
-- **Package manager:** npm
+Interview calendar, task management, notifications and reminders, job search and
+filtering, job analytics, saved internships, and an AI cover letter and CV
+tailorer. See [docs/ROADMAP.md](docs/ROADMAP.md) for the full list, including
+known gaps in what already works.
 
-## Getting Started
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| Frontend | React 19 with Vite |
+| Routing | React Router |
+| Styling | Tailwind CSS v4 |
+| Drag and drop | dnd kit |
+| Backend and database | Supabase (Postgres, Auth, Storage) |
+| Package manager | npm |
+
+## Getting started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) and npm installed
-- A [Supabase](https://supabase.com/) account/project set up
+
+- [Node.js](https://nodejs.org/) and npm
+- A [Supabase](https://supabase.com/) account and project
 
 ### Installation
 
 1. Clone the repository:
 
-```bash
-    git clone https://github.com/Tech-A/310-Group-7.git
-    cd 310-Group-7
-```
+   ```bash
+   git clone https://github.com/310-Blueprint/310-Group-7.git
+   cd 310-Group-7
+   ```
 
 2. Install dependencies:
 
-```bash
-    npm install
-```
+   ```bash
+   npm install
+   ```
 
-3. Create a `.env` file in the project root (see `.env.example`) with the required Supabase keys:
-VITE_SUPABASE_URL=your-project-url
-VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+3. Set up the database. In your Supabase project, open the SQL editor and run
+   [`schema.sql`](./schema.sql) top to bottom. It creates both tables, enables
+   row-level security, adds the policies, and creates the private `documents`
+   storage bucket.
 
-> The `.env` file is git-ignored. Never commit secrets. Required keys are submitted separately on Canvas as per the assignment brief.
+4. Create a `.env.local` file in the project root by copying
+   [`.env.example`](./.env.example), then fill in the values from your Supabase
+   project under Settings, then API:
 
-4. Run the app:
+   ```
+   VITE_SUPABASE_URL=your-project-url
+   VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+   ```
 
-```bash
-    npm run dev
-```
+   > `.env.local` is git-ignored. Never commit secrets. The keys for the team's
+   > project are submitted separately on Canvas as required by the assignment
+   > brief.
+
+5. Configure authentication redirects. In the Supabase dashboard, under
+   Authentication, then URL Configuration, set the **Site URL** to
+   `http://localhost:5173` and add `http://localhost:5173/reset-password` to
+   **Redirect URLs**. Without this the password reset link will not work. See
+   [docs/authentication.md](docs/authentication.md).
+
+6. Run the app:
+
+   ```bash
+   npm run dev
+   ```
+
+### Available scripts
+
+| Script | Does |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production into `dist` |
+| `npm run lint` | Run ESLint across the project |
+| `npm run preview` | Serve the production build locally |
 
 ### Testing
 
-```bash
-    npm run test
-```
+The project does **not** currently have a test framework or any automated tests.
+This is the largest known gap and is tracked as the top item in
+[docs/ROADMAP.md](docs/ROADMAP.md), which also lists suggested first targets.
+
+Until one is adopted, verify changes with `npm run lint`, `npm run build`, and by
+running the app and exercising the affected flows. The feature documents in
+[docs/](docs/) each end with a manual verification checklist.
 
 ### Deployment
 
-Pipeline is deployed using [Netlify](https://www.netlify.com/).
+Pipeline is deployed with [Netlify](https://www.netlify.com/).
 
-**Live Site:** [https://pipeline.netlify.app](https://pipeline.netlify.app) *(update with your actual Netlify URL)*
-
-- The `main` branch is connected to Netlify and automatically deploys on every push/merge.
-- Pull request previews are automatically generated for review before merging (if enabled).
+- The `main` branch is connected to Netlify and deploys automatically on every
+  push or merge.
+- `public/_redirects` contains `/*  /index.html  200`, which is required for
+  client-side routing. Without it, loading `/documents` or `/reset-password`
+  directly returns a 404.
 
 **Build settings:**
+
 | Setting | Value |
-|---|---|
+| --- | --- |
 | Build command | `npm run build` |
 | Publish directory | `dist` |
 
-**Environment variables:** set the same keys used locally (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) under **Netlify → Site settings → Environment variables**.
+**Environment variables:** set the same keys used locally
+(`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) under Netlify, then Site
+settings, then Environment variables. Add the deployed `/reset-password` URL to
+the Supabase Redirect URLs allowlist as well.
 
-## License
+## Documentation
 
-This project is licensed under the terms described in [LICENSE](./LICENSE).
+Technical documentation for contributors lives in [docs/](docs/):
 
-## Versioning
+| Document | Covers |
+| --- | --- |
+| [authentication.md](docs/authentication.md) | Sign-in, sign-up, password reset, and route guards |
+| [database.md](docs/database.md) | The Supabase schema and why row-level security matters |
+| [dashboard.md](docs/dashboard.md) | The kanban board and drag and drop |
+| [documents.md](docs/documents.md) | The documents archive and storage layout |
+| [ui-and-layout.md](docs/ui-and-layout.md) | Shared components, design tokens, and breakpoints |
+| [ROADMAP.md](docs/ROADMAP.md) | Known gaps and work planned for the next iteration |
 
-This project is currently in early development (pre-release). No stable versions have been tagged yet.
-*(Once you start tagging releases, list them here or link to the [Releases](https://github.com/Tech-A/310-Group-7/releases) page.)*
-
-## Getting Help
-
-If you run into issues or have questions:
-- Open an [issue](https://github.com/Tech-A/310-Group-7/issues) on this repository
+The colour palette and design tokens are defined once in
+[`src/styles/preset.css`](src/styles/preset.css) and explained in
+[docs/ui-and-layout.md](docs/ui-and-layout.md).
 
 ## Contributing
 
-Want to contribute code? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the fork/branch/PR workflow and guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the fork, branch, and pull request
+workflow, along with issue and code review expectations.
 
-## Code of Conduct
+Please also review our [Code of Conduct](./CODE_OF_CONDUCT.md) before taking
+part.
 
-Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
+## Getting help
+
+Open an [issue](https://github.com/310-Blueprint/310-Group-7/issues) on this
+repository using the bug report or feature request template.
+
+## Versioning
+
+This project follows [semantic versioning](https://semver.org/). Releases are
+listed on the
+[Releases](https://github.com/310-Blueprint/310-Group-7/releases) page.
+
+## Licence
+
+Released under the MIT Licence. See [LICENSE](./LICENSE).
 
 ## Acknowledgements
 
-**Contributors:**
+**Team Blueprint:**
+
 - Abbey Martinez (amar379@aucklanduni.ac.nz)
-- Caitlin Kuan (ckua141@aucklanduni.ac.nz)
-- Navini Ariyasinghe (kari487@aucklanduni.ac.nz)
-- Julianne Gabas (jgab318@aucklanduni.ac.nz)
 - Alyza So (aso060@aucklanduni.ac.nz)
+- Caitlin Kuan (ckua141@aucklanduni.ac.nz)
+- Julianne Gabas (jgab318@aucklanduni.ac.nz)
+- Navini Ariyasinghe (kari487@aucklanduni.ac.nz)
 - Orion Lim (olim735@aucklanduni.ac.nz)
 
-**Built with:**
-- [React](https://react.dev/)
-- [Vite](https://vitejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Supabase](https://supabase.com/)
+A breakdown of who worked on what is on the project wiki.
 
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
-## Color palette
-
-The project's color palette lives in [`src/styles/preset.css`](src/styles/preset.css), imported by `src/index.css`. Tailwind v4 doesn't have a JS `theme.extend` config, so the palette is defined with Tailwind's CSS-based `@theme` equivalent, which generates matching utility classes (e.g. `bg-brand-blue`, `text-brand-pink`).
-
-| Name   | Utility prefix | Hex       |
-| ------ | --------------- | --------- |
-| Blue   | `brand-blue`    | `#A6C2D2` |
-| Pink   | `brand-pink`    | `#D9BFB1` |
-| Green  | `brand-green`   | `#B8D2C7` |
-| Yellow | `brand-yellow`  | `#F5E0AE` |
-| Black  | `brand-black`   | `#615F5F` |
-| Background | `brand-bg`  | `#F4F4F2` |
-
-Example usage: `<div className="bg-brand-bg text-brand-black">`.
+**Built with:** [React](https://react.dev/), [Vite](https://vitejs.dev/),
+[Tailwind CSS](https://tailwindcss.com/), [Supabase](https://supabase.com/), and
+[dnd kit](https://dndkit.com/).

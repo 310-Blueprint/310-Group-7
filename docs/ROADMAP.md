@@ -111,19 +111,21 @@ enough to be broken into several issues.
 | Saved internships | Roles saved to apply to later, distinct from applications already in progress. |
 | AI CV and cover letter tailorer | The original motivation for the project: tailoring stored documents to a specific role. Needs the `documents` table wired up first so document type is known. |
 
-## Documentation debt
+## Documentation and repository setup
 
-- `README.md` documents an `npm run test` script that does not exist, names the
-  environment file as `.env` where the code uses `.env.local`, describes the
-  kanban columns as "In Progress, Accepted, Rejected" rather than the four that
-  exist, and still carries an unedited Vite scaffold section under a second
-  top-level heading.
-- `CONTRIBUTING.md` names the environment variable `VITE_SUPABASE_ANON_KEY`
-  rather than `VITE_SUPABASE_PUBLISHABLE_KEY`, contains unresolved
-  "[Team to confirm]" placeholders, and points at issue templates that do not
-  exist in the repository.
-- There is no `.github/` directory, so there are no bug report or feature
-  request templates, no pull request template, and no CI workflows.
-- The project is named four different ways across the repository: "Pipeline"
-  (the product), `310-group-7` (`package.json`), "Tech-A" (the GitHub
-  organisation), and "310-Blueprint" (`LICENSE`).
+- **No CI workflows.** `.github/` holds the issue and pull request templates but
+  no GitHub Actions. Lint and build are run by hand by the author and again by
+  the reviewer. A workflow running `npm run lint` and `npm run build` on every
+  pull request would catch breakage before review, and is the natural place to
+  hang a test suite once one exists.
+- **Sonar and Snyk are configured outside the repository.** There is no
+  `sonar-project.properties` and no Snyk configuration tracked here, so the
+  analysis setup is not reproducible by a new contributor from the repository
+  alone.
+- **The live Netlify URL is not recorded** in the README's deployment section.
+- **No release has been tagged yet.** The README points at the Releases page and
+  the project follows semantic versioning, but nothing is published there.
+- **The wiki contributions page has empty issue-number columns.** Contributions
+  should tie back to tracked issues.
+- `package.json` still carries the scaffold name `310-group-7` rather than
+  `pipeline`. Cosmetic, but it is what appears in build output.
