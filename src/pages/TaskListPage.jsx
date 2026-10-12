@@ -28,6 +28,7 @@ import {
   fetchTasksByColumn,
   insertTask,
   updateTask,
+  deleteTask,
   updateTaskPositions,
 } from '../lib/tasks'
 
@@ -274,19 +275,38 @@ function TaskListPage() {
     setEditingTask(null)
   }
 
-  function handleDeleteTask(taskId) {
-    setTasks((prev) => {
-      const column = findContainer(prev, taskId)
-      if (!column) return prev
+  async function handleDeleteTask(taskId) {
+    const column = findContainer(tasks, taskId)
 
-      return {
-        ...prev,
-        [column]: prev[column].filter(
-          (task) => task.id !== taskId,
-        ),
-      }
-    })
+    if (!column) {
+      return
+    }
+
+    setSaveError(null)
+
+    try {
+      // Delete the task from Supabase first.
+      await deleteTask(taskId)
+
+      // Remove the task from React after deletion succeeds.
+      setTasks((prev) => {
+        const currentColumn = findContainer(prev, taskId)
+
+        if (!currentColumn) return prev
+
+        return {
+          ...prev,
+          [currentColumn]: prev[currentColumn].filter(
+            (task) => task.id !== taskId,
+          ),
+        }
+      })
+    } catch (error) {
+      console.error('Failed to delete task', error)
+      setSaveError('Could not delete task. Please try again.')
+    }
   }
+
 
   // Record the currently dragged task for the drag overlay.
   function handleDragStart(event) {
