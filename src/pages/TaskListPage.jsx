@@ -397,15 +397,34 @@ function TaskListPage() {
         (task) => task.id !== active.id,
       )
 
+      
       const destinationIndex = destinationTasks.findIndex(
         (task) => task.id === over.id,
       )
 
-      // Append to the end if dropped onto the column itself.
+      // Calculate the pointer's position when the drag finishes.
+      const pointerY =
+        typeof event.activatorEvent?.clientY === 'number'
+          ? event.activatorEvent.clientY + event.delta.y
+          : null
+
+      // Check if the nearest target is the last task.
+      const isLastTask =
+        destinationIndex === destinationTasks.length - 1
+
+      // Insert after the last task if dropped below its midpoint.
+      const droppedAtBottom =
+        isLastTask &&
+        pointerY !== null &&
+        pointerY > over.rect.top + over.rect.height / 2
+
+      // Append to the bottom when dropped onto the column itself
+      // or below the last task. Otherwise, insert before the target.
       const insertIndex =
-        destinationIndex === -1
+        destinationIndex === -1 || droppedAtBottom
           ? destinationTasks.length
           : destinationIndex
+
 
       const updatedDestinationTasks = [...destinationTasks]
 
