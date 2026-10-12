@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -24,7 +24,11 @@ import PageShell, {
 import TaskModal from '../components/TaskModal'
 import TaskColumn from '../components/TaskColumn'
 import TaskCard from '../components/TaskCard'
-import { fetchTasksByColumn } from '../lib/tasks'
+import {
+  fetchTasksByColumn,
+  insertTask,
+  updateTaskPositions,
+} from '../lib/tasks'
 
 // Define the task columns, including their unique IDs,
 // display names, and background colours.
@@ -99,6 +103,8 @@ function TaskListPage() {
   const [editingTask, setEditingTask] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
+  const isSavingPositions = useRef(false)
+  const [saveError, setSaveError] = useState(null)
 
   // Due Soon is calculated from the existing tasks.
   const dueSoonTasks = getDueSoonTasks(tasks)
@@ -143,19 +149,22 @@ function TaskListPage() {
   )
 
   // Create a new task in the selected column.
-  function handleAddTask(task) {
+  async function handleAddTask(task) {
     const status = TASK_COLUMNS.some(
       (column) => column.id === task.status,
     )
-    // Default to the "To Do" column if an invalid status is provided.
+      // Default to the "To Do" column if an invalid status is provided.
       ? task.status
       : 'todo'
 
-    const newTask = {
+    // New tasks are placed at the end of their selected column.
+    const position = tasks[status].length
+
+    const newTask = await insertTask({
       ...task,
-      id: crypto.randomUUID(),
       status,
-    }
+      position,
+    })
 
     // Update the task state while preserving existing tasks.
     setTasks((prev) => ({
@@ -272,63 +281,69 @@ function TaskListPage() {
   }
 
   // Move or reorder a task when dragging finishes.
-  function handleDragEnd(event) {
+
+  // Move or reorder a task when dragging finishes.
+  async function handleDragEnd(event) {
     const { active, over } = event
 
     setActiveTask(null)
 
+    // Prevent another drag while a previous move is saving.
+    if (isSavingPositions.current) return
+
     // If dropped outside all columns, do nothing.
-    if (!over) return
+    if (!over) { 
+      return
+    }
 
     // Due Soon column is read-only and cannot receive dragged tasks.
-    if (over.id === DUE_SOON_COLUMN.id) return
+    if (over.id === DUE_SOON_COLUMN.id) {
+      return
+    }
+    const sourceColumn = findContainer(tasks, active.id)
+    const destinationColumn = findContainer(tasks, over.id)
 
-    setTasks((prev) => {
-      const sourceColumn = findContainer(prev, active.id)
-      const destinationColumn = findContainer(prev, over.id)
+    // Only real task columns are valid destinations.
+    if (
+      !sourceColumn ||
+      !destinationColumn ||
+      !TASK_COLUMNS.some(
+        (column) => column.id === destinationColumn,
+      )
+    ) {
+      return
+    }
 
-      // Only real task columns are valid destinations.
-      if (
-        !sourceColumn ||
-        !destinationColumn ||
-        !TASK_COLUMNS.some(
-          (column) => column.id === destinationColumn,
-        )
-      ) {
-        return prev
-      }
+    const sourceTasks = tasks[sourceColumn]
+    const destinationTasks = tasks[destinationColumn]
 
-      const sourceTasks = prev[sourceColumn]
-      const destinationTasks = prev[destinationColumn]
+    const sourceIndex = sourceTasks.findIndex(
+      (task) => task.id === active.id,
+    )
 
-      const sourceIndex = sourceTasks.findIndex(
-        (task) => task.id === active.id,
+    if (sourceIndex === -1) return
+
+    const draggedTask = sourceTasks[sourceIndex]
+    let updatedTasks
+
+    // Reorder tasks within the same column.
+    if (sourceColumn === destinationColumn) {
+      const destinationIndex = destinationTasks.findIndex(
+        (task) => task.id === over.id,
       )
 
-      if (sourceIndex === -1) return prev
+      if (destinationIndex === -1) return
+      if (sourceIndex === destinationIndex) return
 
-      const draggedTask = sourceTasks[sourceIndex]
-
-      // Reorder tasks within the same column.
-      if (sourceColumn === destinationColumn) {
-        const destinationIndex = destinationTasks.findIndex(
-          (task) => task.id === over.id,
-        )
-
-        if (destinationIndex === -1) return prev
-
-        if (sourceIndex === destinationIndex) return prev
-
-        return {
-          ...prev,
-          [sourceColumn]: arrayMove(
-            sourceTasks,
-            sourceIndex,
-            destinationIndex,
-          ),
-        }
+      updatedTasks = {
+        ...tasks,
+        [sourceColumn]: arrayMove(
+          sourceTasks,
+          sourceIndex,
+          destinationIndex,
+        ),
       }
-
+    } else {
       // Move a task to another column and update its status.
       const updatedTask = {
         ...draggedTask,
@@ -358,12 +373,54 @@ function TaskListPage() {
         updatedTask,
       )
 
-      return {
-        ...prev,
+      updatedTasks = {
+        ...tasks,
         [sourceColumn]: remainingSourceTasks,
         [destinationColumn]: updatedDestinationTasks,
       }
-    })
+    }
+    setTasks(updatedTasks)
+    setSaveError(null)
+    isSavingPositions.current = true
+
+    try {
+      if (sourceColumn === destinationColumn) {
+        // Save the new ordering within one column.
+        await updateTaskPositions(
+          sourceColumn,
+          updatedTasks[sourceColumn],
+        )
+      } else {
+        // Save both the original and destination columns.
+        await Promise.all([
+          updateTaskPositions(
+            sourceColumn,
+            updatedTasks[sourceColumn],
+          ),
+          updateTaskPositions(
+            destinationColumn,
+            updatedTasks[destinationColumn],
+          ),
+        ])
+      }
+    } catch (error) {
+      console.error('Failed to save task position', error)
+
+      setSaveError(
+        'Could not save task movement. Please try again.',
+      )
+
+      // Restore the last saved state from Supabase.
+      try {
+        const savedTasks = await fetchTasksByColumn(TASK_COLUMNS)
+        setTasks(savedTasks)
+      } catch (fetchError) {
+        console.error('Failed to reload tasks', fetchError)
+        setTasks(tasks)
+      }
+    } finally {
+      isSavingPositions.current = false
+    }
   }
 
   function handleDragCancel() {

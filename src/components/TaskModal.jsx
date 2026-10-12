@@ -53,6 +53,8 @@ export default function TaskModal({ isOpen, onClose, onSubmit, taskToEdit = null
   const [dueDate, setDueDate] = useState(taskToEdit?.dueDate ?? '',)
   const [status, setStatus] = useState(taskToEdit?.status ?? 'todo',)
   const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
   const isEditing = Boolean(taskToEdit)
 
   useEffect(() => {
@@ -95,28 +97,39 @@ export default function TaskModal({ isOpen, onClose, onSubmit, taskToEdit = null
     return newErrors
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+
+    // Prevent multiple submissions while saving.
+    if (isSubmitting) { 
+      return 
+    }
 
     const newErrors = validate()
     setErrors(newErrors)
 
-    if (Object.keys(newErrors).length > 0) return
+    if (Object.keys(newErrors).length > 0) { 
+      return
+    }
 
-    onSubmit?.({
-    ...(isEditing ? { id: taskToEdit.id } : {}),
-    title: title.trim(),
-    description: description.trim(),
-    dueDate: dueDate || null,
-    status,
-    })
+    setIsSubmitting(true)
+    setSubmitError(null)
 
-    // Reset the form after a successful submission.
-    setTitle('')
-    setDescription('')
-    setDueDate('')
-    setStatus('todo')
-    setErrors({})
+    try {
+      // Wait for the parent page to finish saving the task.
+      await onSubmit?.({
+        ...(isEditing ? { id: taskToEdit.id } : {}),
+        title: title.trim(),
+        description: description.trim(),
+        dueDate: dueDate || null,
+        status,
+      })
+    } catch (error) {
+      console.error('Failed to save task', error)
+      setSubmitError('Could not save the task. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
