@@ -63,8 +63,8 @@ the pure logic that currently has no coverage at all:
 
 ### User experience
 
-- **The greeting is hardcoded.** Both `DashboardPage.jsx` and `DocumentsPage.jsx`
-  render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
+- **The greeting is hardcoded.** the pages `DashboardPage.jsx`, `DocumentsPage.jsx` and `TaskListPage.jsx`
+render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 - **No user profile.** There is no `/profile` route and no way to change a
   display name, email, or password while signed in. Password reset only works
   through the signed-out email flow.
