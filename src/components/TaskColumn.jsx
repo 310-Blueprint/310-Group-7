@@ -18,6 +18,7 @@ function TaskColumn({
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
+    disabled: readOnly,
     data: {
       type: 'column',
       readOnly,
@@ -26,6 +27,7 @@ function TaskColumn({
 
   return (
     <section
+      ref={setNodeRef}
       className={`${tone} flex min-h-56 flex-col rounded-[1.35rem] p-4`}
     >
       <header className="mb-7 flex items-center justify-between px-1">
@@ -40,7 +42,6 @@ function TaskColumn({
       </header>
 
       <div
-        ref={setNodeRef}
         className={`min-h-24 flex-1 space-y-3 overflow-y-auto rounded-xl transition-colors ${
           isOver && !readOnly ? 'bg-white/15' : ''
         }`}

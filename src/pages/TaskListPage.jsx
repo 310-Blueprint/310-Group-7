@@ -5,6 +5,7 @@ import {
   KeyboardSensor,
   PointerSensor,
   closestCorners,
+  pointerWithin,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -96,6 +97,22 @@ function getDueSoonTasks(tasks) {
       return dueDate >= today && dueDate <= cutoff
     })
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+}
+
+// Use the pointer to choose the actual column or task under the cursor.
+// Prefer task cards when the pointer overlaps both a card and its column.
+function detectTaskCollision(args) {
+  if (args.pointerCoordinates) {
+    const collisions = pointerWithin(args)
+    const cardCollisions = collisions.filter(
+      ({ id }) => !TASK_COLUMNS.some((column) => column.id === id),
+    )
+
+    return cardCollisions.length > 0 ? cardCollisions : collisions
+  }
+
+  // Fall back to closest corners for keyboard dragging.
+  return closestCorners(args)
 }
 
 function TaskListPage() {
@@ -370,9 +387,10 @@ function TaskListPage() {
 
     // Reorder tasks within the same column.
     if (sourceColumn === destinationColumn) {
-      const destinationIndex = destinationTasks.findIndex(
-        (task) => task.id === over.id,
-      )
+      // Dropping in blank space in this column moves the task to the end.
+      const destinationIndex = over.id === sourceColumn
+        ? destinationTasks.length - 1
+        : destinationTasks.findIndex((task) => task.id === over.id)
 
       if (destinationIndex === -1) return
       if (sourceIndex === destinationIndex) return
@@ -540,7 +558,7 @@ function TaskListPage() {
 
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={detectTaskCollision}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
