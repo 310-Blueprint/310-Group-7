@@ -27,6 +27,7 @@ import TaskCard from '../components/TaskCard'
 import {
   fetchTasksByColumn,
   insertTask,
+  updateTask,
   updateTaskPositions,
 } from '../lib/tasks'
 
@@ -195,41 +196,63 @@ function TaskListPage() {
   }
 
   // Save edits to an existing task.
-  function handleUpdateTask(updatedTask) {
+  async function handleUpdateTask(updatedTask) {
+    const sourceColumn = findContainer(tasks, updatedTask.id)
+
+    if (!sourceColumn) {
+      throw new Error('Task not found')
+    }
+
+    const originalTask = tasks[sourceColumn].find(
+      (task) => task.id === updatedTask.id,
+    )
+
+    if (!originalTask) {
+      throw new Error('Task not found')
+    }
+
+  
+    const destinationColumn = TASK_COLUMNS.some(
+      (column) => column.id === updatedTask.status,
+    )
+      ? updatedTask.status
+      : sourceColumn
+
+    // Prepare the changes that will be saved to Supabase.
+    const changes = {
+      title: updatedTask.title,
+      description: updatedTask.description,
+      dueDate: updatedTask.dueDate,
+      status: destinationColumn,
+    }
+
+    // If the task changes columns, place it at the end of
+    // the destination column.
+    if (sourceColumn !== destinationColumn) {
+      changes.position = Math.max(
+        -1,
+        ...tasks[destinationColumn].map(
+          (task, index) => task.position ?? index,
+        ),
+      ) + 1
+    }
+
+    // Wait for Supabase to save the edits.
+    const savedTask = await updateTask(updatedTask.id, changes)
+
     setTasks((prev) => {
-      const sourceColumn = findContainer(prev, updatedTask.id)
+      const currentColumn = findContainer(prev, savedTask.id)
 
-      if (!sourceColumn) {
+      if (!currentColumn) {
         return prev
       }
 
-      const originalTask = prev[sourceColumn].find(
-        (task) => task.id === updatedTask.id,
-      )
-
-      if (!originalTask) {
-        return prev
-      }
-
-      const destinationColumn = Object.hasOwn(
-        prev,
-        updatedTask.status,
-      )
-        ? updatedTask.status
-        : sourceColumn
-
-      const task = {
-        ...originalTask,
-        ...updatedTask,
-        status: destinationColumn,
-      }
-
-      // Update the task in its current column.
-      if (sourceColumn === destinationColumn) {
+      // Update the task without moving it if the status is unchanged.
+      if (currentColumn === savedTask.status) {
         return {
           ...prev,
-          [sourceColumn]: prev[sourceColumn].map((item) =>
-            item.id === task.id ? task : item,
+          [currentColumn]: prev[currentColumn].map((task) =>
+            task.id === savedTask.id ? savedTask : task,
           ),
         }
       }
@@ -237,12 +260,12 @@ function TaskListPage() {
       // Move the task if the user changed its status.
       return {
         ...prev,
-        [sourceColumn]: prev[sourceColumn].filter(
-          (item) => item.id !== task.id,
+        [currentColumn]: prev[currentColumn].filter(
+          (task) => task.id !== savedTask.id,
         ),
-        [destinationColumn]: [
-          ...prev[destinationColumn],
-          task,
+        [savedTask.status]: [
+          ...prev[savedTask.status],
+          savedTask,
         ],
       }
     })
@@ -280,7 +303,6 @@ function TaskListPage() {
     setActiveTask(draggedTask ?? null)
   }
 
-  // Move or reorder a task when dragging finishes.
 
   // Move or reorder a task when dragging finishes.
   async function handleDragEnd(event) {
@@ -292,7 +314,7 @@ function TaskListPage() {
     if (isSavingPositions.current) return
 
     // If dropped outside all columns, do nothing.
-    if (!over) { 
+    if (!over) {
       return
     }
 
