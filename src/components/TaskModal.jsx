@@ -247,12 +247,29 @@ export default function TaskModal({ isOpen, onClose, onSubmit, taskToEdit = null
                 )}
               </div>
 
+              
+              {/* Display an error if Supabase fails to save the task. */}
+              {submitError && (
+                <p
+                  role="alert"
+                  className="text-center text-sm text-red-300"
+                >
+                  {submitError}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="mt-2 w-full self-center rounded-full bg-brand-yellow px-6 py-3.5 text-lg font-bold text-brand-black transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-yellow active:scale-[0.98] sm:w-auto sm:min-w-[60%]"
+                disabled={isSubmitting}
+                className="mt-2 w-full self-center rounded-full bg-brand-yellow px-6 py-3.5 text-lg font-bold text-brand-black transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-yellow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[60%]"
               >
-                {isEditing ? 'Save Changes' : 'Submit'}
+                {isSubmitting
+                  ? 'Saving...'
+                  : isEditing
+                    ? 'Save Changes'
+                    : 'Submit'}
               </button>
+
             </form>
           </div>
         </div>

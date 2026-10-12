@@ -543,6 +543,15 @@ function TaskListPage() {
               Couldn't load tasks. Try refreshing.
             </p>
           )}
+          
+          {saveError && (
+            <p
+              role="alert"
+              className="mt-1 text-xs text-red-600"
+            >
+              {saveError}
+            </p>
+          )}
         </div>
 
         <button
