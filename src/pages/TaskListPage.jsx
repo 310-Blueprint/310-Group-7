@@ -5,7 +5,6 @@ import {
   KeyboardSensor,
   PointerSensor,
   closestCorners,
-  pointerWithin,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -13,6 +12,7 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
+import confetti from 'canvas-confetti'
 
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
@@ -49,6 +49,22 @@ const DUE_SOON_COLUMN = {
 }
 
 const DUE_SOON_DAYS = 7
+
+// Use the same brand-colour confetti effect as the Dashboard's Offer column.
+const CONFETTI_COLORS = ['#F5E0AE', '#A6C2D2', '#D9BFB1', '#B8D2C7']
+
+function celebrateCompletedTask() {
+  const fire = (options) =>
+    confetti({
+      origin: { y: 0.65 },
+      colors: CONFETTI_COLORS,
+      disableForReducedMotion: true,
+      ...options,
+    })
+
+  fire({ particleCount: 60, spread: 55, angle: 60, origin: { x: 0.75, y: 0.65 } })
+  fire({ particleCount: 60, spread: 55, angle: 120, origin: { x: 0.75, y: 0.65 } })
+}
 
 // Create an empty array for every task column.
 // Tasks will be loaded from Supabase.
@@ -97,22 +113,6 @@ function getDueSoonTasks(tasks) {
       return dueDate >= today && dueDate <= cutoff
     })
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
-}
-
-// Use the pointer to choose the actual column or task under the cursor.
-// Prefer task cards when the pointer overlaps both a card and its column.
-function detectTaskCollision(args) {
-  if (args.pointerCoordinates) {
-    const collisions = pointerWithin(args)
-    const cardCollisions = collisions.filter(
-      ({ id }) => !TASK_COLUMNS.some((column) => column.id === id),
-    )
-
-    return cardCollisions.length > 0 ? cardCollisions : collisions
-  }
-
-  // Fall back to closest corners for keyboard dragging.
-  return closestCorners(args)
 }
 
 function TaskListPage() {
@@ -288,6 +288,11 @@ function TaskListPage() {
       }
     })
 
+    // Celebrate when an edited task moves into Completed.
+    if (sourceColumn !== 'completed' && savedTask.status === 'completed') {
+      celebrateCompletedTask()
+    }
+
     setIsModalOpen(false)
     setEditingTask(null)
   }
@@ -387,10 +392,9 @@ function TaskListPage() {
 
     // Reorder tasks within the same column.
     if (sourceColumn === destinationColumn) {
-      // Dropping in blank space in this column moves the task to the end.
-      const destinationIndex = over.id === sourceColumn
-        ? destinationTasks.length - 1
-        : destinationTasks.findIndex((task) => task.id === over.id)
+      const destinationIndex = destinationTasks.findIndex(
+        (task) => task.id === over.id,
+      )
 
       if (destinationIndex === -1) return
       if (sourceIndex === destinationIndex) return
@@ -482,6 +486,11 @@ function TaskListPage() {
           ),
         ])
       }
+
+      // Celebrate only after successfully saving a move into Completed.
+      if (sourceColumn !== 'completed' && destinationColumn === 'completed') {
+        celebrateCompletedTask()
+      }
     } catch (error) {
       console.error('Failed to save task position', error)
 
@@ -558,7 +567,7 @@ function TaskListPage() {
 
       <DndContext
         sensors={sensors}
-        collisionDetection={detectTaskCollision}
+        collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
