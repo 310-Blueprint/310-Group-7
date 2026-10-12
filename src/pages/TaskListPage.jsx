@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -24,6 +24,7 @@ import PageShell, {
 import TaskModal from '../components/TaskModal'
 import TaskColumn from '../components/TaskColumn'
 import TaskCard from '../components/TaskCard'
+import { fetchTasksByColumn } from '../lib/tasks'
 
 // Define the task columns, including their unique IDs,
 // display names, and background colours.
@@ -96,9 +97,40 @@ function TaskListPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeTask, setActiveTask] = useState(null)
   const [editingTask, setEditingTask] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
 
   // Due Soon is calculated from the existing tasks.
   const dueSoonTasks = getDueSoonTasks(tasks)
+
+  // Retrieve the user's saved tasks when the page opens.
+  useEffect(() => {
+    let cancelled = false
+
+    fetchTasksByColumn(TASK_COLUMNS)
+      .then((grouped) => {
+        if (!cancelled) {
+          setTasks(grouped)
+          setLoadError(null)
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error('Failed to load tasks', error)
+          setLoadError(error)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      })
+
+    // Prevent requests from updating state after leaving the page.
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Configure drag-and-drop for pointer and keyboard input.
   const sensors = useSensors(
@@ -137,7 +169,7 @@ function TaskListPage() {
   // Find the task being edited and open the modal.
   function handleEditTask(taskId) {
     const column = findContainer(tasks, taskId)
-    if (!column) { 
+    if (!column) {
       return
     }
 
@@ -145,9 +177,9 @@ function TaskListPage() {
       (item) => item.id === taskId,
     )
 
-  if (!task) { 
-    return
-  }
+    if (!task) {
+      return
+    }
 
     setEditingTask(task)
     setIsModalOpen(true)
@@ -166,8 +198,8 @@ function TaskListPage() {
         (task) => task.id === updatedTask.id,
       )
 
-      if (!originalTask) { 
-        return prev 
+      if (!originalTask) {
+        return prev
       }
 
       const destinationColumn = Object.hasOwn(
@@ -193,7 +225,7 @@ function TaskListPage() {
         }
       }
 
-    // Move the task if the user changed its status.
+      // Move the task if the user changed its status.
       return {
         ...prev,
         [sourceColumn]: prev[sourceColumn].filter(
@@ -348,15 +380,34 @@ function TaskListPage() {
           <p className="mt-1 text-base">
             Welcome to your task dashboard
           </p>
+
+          {isLoading && (
+            <p
+              role="status"
+              className="mt-1 text-xs text-brand-black/60"
+            >
+              Loading your tasks…
+            </p>
+          )}
+
+          {loadError && (
+            <p
+              role="alert"
+              className="mt-1 text-xs text-red-600"
+            >
+              Couldn't load tasks. Try refreshing.
+            </p>
+          )}
         </div>
 
         <button
           type="button"
+          disabled={isLoading || Boolean(loadError)}
           onClick={() => {
             setEditingTask(null)
             setIsModalOpen(true)
           }}
-          className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
+          className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto ${PRIMARY_PILL_CLASSES}`}
         >
           + Add task
         </button>
