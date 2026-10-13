@@ -4,14 +4,13 @@ const FIELDS = [
   { id: "company", label: "Company", placeholder: "Company Name" },
   { id: "location", label: "Location", placeholder: "City, Country Code" },
   { id: "role", label: "Role", placeholder: "Role" },
-  { id: "dueDate", label: "Due Date", type: "date" },
 ];
 
 const EMPTY_FILTERS = {
   company: "",
   location: "",
   role: "",
-  dueDate: "",
+  sortOrder: "",
 };
 
 // Every field in the modal shares this look, so it's factored out rather
@@ -35,8 +34,8 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
     const dialogRef = useRef(null);
     const [company, setCompany] = useState("");
     const [role, setRole] = useState("");
-    const [dueDate, setDueDate] = useState("");
     const [location, setLocation] = useState("");
+    const [sortOrder, setSortOrder] = useState("");
     useEffect(() => {
         const dialog = dialogRef.current;
         if (!dialog) return;
@@ -60,8 +59,8 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
         return () => dialog.removeEventListener("close", handleNativeClose);
     }, [onClose]);
 
-    const values = { company, location, role, dueDate };
-    const setters = { company: setCompany, location: setLocation, role: setRole, dueDate: setDueDate };
+    const values = { company, location, role };
+    const setters = { company: setCompany, location: setLocation, role: setRole };
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -69,7 +68,7 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
           company: company.trim(),
           location: location.trim(),
           role: role.trim(),
-          dueDate,
+          sortOrder,
         });
         dialogRef.current?.close();
     }
@@ -78,7 +77,7 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
         setCompany("");
         setLocation("");
         setRole("");
-        setDueDate("");
+        setSortOrder("");
         onSubmit?.({ ...EMPTY_FILTERS });
         dialogRef.current?.close();
     }
@@ -117,6 +116,20 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
                     onChange={(e) => setters[field.id](e.target.value)}
                   />
                 ))}
+
+                {/* DROP DOWN BOX FOR SORT BY DUE DATE*/}
+                <label className="flex flex-col gap-2">
+                    <span className="font-medium text-brand-bg">Sort by due date</span>
+                    <select
+                        value={sortOrder}
+                        onChange={(event) => setSortOrder(event.target.value)}
+                        className="rounded-full bg-input-bg px-5 py-3 text-brand-black"
+                    >
+                        <option value="">Default order</option>
+                        <option value="asc">Earliest first</option>
+                        <option value="desc">Latest first</option>
+                    </select>
+                </label>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                     <button

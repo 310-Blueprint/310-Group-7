@@ -48,25 +48,33 @@ function matchesText(value, filter) {
 }
 
 function matchesFilters(application, filters) {
-  const matchesDate =
-    !filters.dueDate || application.dueDate?.slice(0, 10) === filters.dueDate
-
   return (
     matchesText(application.company, filters.company) &&
     matchesText(application.location, filters.location) &&
-    matchesText(application.role, filters.role) &&
-    matchesDate
+    matchesText(application.role, filters.role)
   )
 }
 
-// actual filter function
 function filterItems(items, filters) {
   const visibleItems = {}
 
   for (const column of COLUMNS) {
-    visibleItems[column.id] = items[column.id].filter((application) =>
+    const applications = items[column.id].filter((application) =>
       matchesFilters(application, filters),
     )
+
+    if (filters.sortOrder) {
+      applications.sort((a, b) => {
+        const dateA = new Date(a.dueDate).getTime()
+        const dateB = new Date(b.dueDate).getTime()
+
+        return filters.sortOrder === 'asc'
+          ? dateA - dateB
+          : dateB - dateA
+      })
+    }
+
+    visibleItems[column.id] = applications
   }
 
   return visibleItems
@@ -99,7 +107,7 @@ function DashboardPage() {
     company: '',
     location: '',
     role: '',
-    dueDate: '',
+    sortOrder: '',
   })
 
   useEffect(() => {
