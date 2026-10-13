@@ -7,6 +7,13 @@ const FIELDS = [
   { id: "dueDate", label: "Due Date", type: "date" },
 ];
 
+const EMPTY_FILTERS = {
+  company: "",
+  location: "",
+  role: "",
+  dueDate: "",
+};
+
 // Every field in the modal shares this look, so it's factored out rather
 // than repeated per field (see Field.jsx for the auth flow's equivalent).
 function ModalField({ label, type = "text", placeholder, value, onChange }) {
@@ -67,7 +74,14 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
         dialogRef.current?.close();
     }
 
-    
+    function handleClear() {
+        setCompany("");
+        setLocation("");
+        setRole("");
+        setDueDate("");
+        onSubmit?.({ ...EMPTY_FILTERS });
+        dialogRef.current?.close();
+    }
 
     return (
         <dialog
@@ -104,12 +118,22 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
                   />
                 ))}
 
-                <button
-                type="submit"
-                className="mt-2 w-full self-center rounded-full bg-brand-yellow px-6 py-3.5 text-lg font-bold text-brand-black transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-yellow active:scale-[0.98] sm:w-auto sm:min-w-[60%]"
-                >
-                Submit
-                </button>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                    <button
+                    type="submit"
+                    className="mt-2 w-full rounded-full bg-brand-yellow px-12 py-3.5 text-lg font-bold text-brand-black transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-yellow active:scale-[0.98] sm:w-auto"
+                    >
+                    Submit
+                    </button>
+
+                    <button
+                    type="button"
+                    onClick={handleClear}
+                    className="mt-2 w-full rounded-full border border-white/60 px-6 py-3.5 text-lg font-bold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.98] sm:w-auto"
+                    >
+                    Clear filters
+                    </button>
+                </div>
                 </form>
           </div>
         </div>
