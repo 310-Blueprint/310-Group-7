@@ -9,10 +9,10 @@ const FIELDS = [
 
 // Every field in the modal shares this look, so it's factored out rather
 // than repeated per field (see Field.jsx for the auth flow's equivalent).
-function ModalField({ label, type = "text", placeholder, value, onChange, error }) {
+function ModalField({ label, type = "text", placeholder, value, onChange }) {
   return (
     <label className="flex flex-col gap-2">
-      <span className="font-medium text-brand-bg">{label} *</span>
+      <span className="font-medium text-brand-bg">{label}</span>
       <input
         type={type}
         placeholder={placeholder}
@@ -20,33 +20,16 @@ function ModalField({ label, type = "text", placeholder, value, onChange, error 
         onChange={onChange}
         className="min-w-0 rounded-full bg-input-bg px-5 py-3 text-brand-black outline-none placeholder:text-input-placeholder focus-visible:ring-2 focus-visible:ring-brand-yellow sm:py-3.5"
       />
-      {error && <span className="px-2 text-sm text-red-300">{error}</span>}
     </label>
   );
 }
 
-function capitaliseWords(text){
-      return text.trim().split(" ").filter(Boolean).map((word) => {
-        const bare = word.replace(/[^a-zA-Z]/g, "");
-
-        if (bare.length === 2){
-          return word.toUpperCase(); 
-        }
-
-        const lower = word.toLowerCase(); 
-        return lower.charAt(0).toUpperCase() + lower.slice(1);
-      })
-      .join(" ");
-    }
-    
-export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
+export default function FilterModal({ isOpen, onClose, onSubmit }) {
     const dialogRef = useRef(null);
     const [company, setCompany] = useState("");
     const [role, setRole] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [location, setLocation] = useState("");
-    const [errors, setErrors] = useState({});
-
     useEffect(() => {
         const dialog = dialogRef.current;
         if (!dialog) return;
@@ -70,31 +53,18 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
         return () => dialog.removeEventListener("close", handleNativeClose);
     }, [onClose]);
 
-    function validate() {
-        const newErrors = {};
-        if (!company.trim()) newErrors.company = "Company is required";
-        if (!role.trim()) newErrors.role = "Role is required";
-        if (!dueDate) newErrors.dueDate = "Due Date is required";
-        if(!location) newErrors.location = "Location is required";
-        return newErrors;
-    }
-
     const values = { company, location, role, dueDate };
     const setters = { company: setCompany, location: setLocation, role: setRole, dueDate: setDueDate };
 
     function handleSubmit(e) {
         e.preventDefault();
-        const newErrors = validate();
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length > 0) return;
-
-        onSubmit?.({ company: company.trim(), location: capitaliseWords(location), role: role.trim(), dueDate });
-        setCompany("");
-        setLocation(""); 
-        setRole("");
-        setDueDate("");
-        
-        setErrors({});
+        onSubmit?.({
+          company: company.trim(),
+          location: location.trim(),
+          role: role.trim(),
+          dueDate,
+        });
+        dialogRef.current?.close();
     }
 
     
@@ -119,7 +89,7 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
               id="modal-title"
               className="text-center text-3xl font-bold tracking-tight text-brand-black sm:text-5xl"
             >
-              ADD APPLICATION
+              APPLY FILTERS
             </h2>
           </div>
 
@@ -131,7 +101,6 @@ export default function ApplicationModal({ isOpen, onClose, onSubmit }) {
                     {...field}
                     value={values[field.id]}
                     onChange={(e) => setters[field.id](e.target.value)}
-                    error={errors[field.id]}
                   />
                 ))}
 

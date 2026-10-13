@@ -41,6 +41,37 @@ function findContainer(items, id) {
   return Object.keys(items).find((key) => items[key].some((item) => item.id === id))
 }
 
+// helper methods to apply filters to jobs on board
+function matchesText(value, filter) {
+  const searchText = filter.trim().toLowerCase()
+  return !searchText || (value ?? '').toLowerCase().includes(searchText)
+}
+
+function matchesFilters(application, filters) {
+  const matchesDate =
+    !filters.dueDate || application.dueDate?.slice(0, 10) === filters.dueDate
+
+  return (
+    matchesText(application.company, filters.company) &&
+    matchesText(application.location, filters.location) &&
+    matchesText(application.role, filters.role) &&
+    matchesDate
+  )
+}
+
+// actual filter function
+function filterItems(items, filters) {
+  const visibleItems = {}
+
+  for (const column of COLUMNS) {
+    visibleItems[column.id] = items[column.id].filter((application) =>
+      matchesFilters(application, filters),
+    )
+  }
+
+  return visibleItems
+}
+
 function celebrateOffer() {
   const fire = (options) =>
     confetti({
@@ -63,6 +94,13 @@ function DashboardPage() {
   const [dragStartContainer, setDragStartContainer] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  // Stored filter values/states
+  const [filters, setFilters] = useState({
+    company: '',
+    location: '',
+    role: '',
+    dueDate: '',
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -88,6 +126,8 @@ function DashboardPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
+
+  const visibleItems = filterItems(items, filters)
 
   function handleDragStart(event) {
     const container = findContainer(items, event.active.id)
@@ -249,7 +289,7 @@ function DashboardPage() {
               id={column.id}
               title={column.title}
               tone={column.tone}
-              applications={items[column.id]}
+              applications={visibleItems[column.id]}
               onDeleteApplication={handleDeleteApplication}
             />
           ))}
@@ -287,6 +327,10 @@ function DashboardPage() {
       <FilterModal
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
+        onSubmit={(nextFilters) => {
+          setFilters(nextFilters)
+          setIsFilterOpen(false)
+        }}
       />
     </PageShell>
   )
