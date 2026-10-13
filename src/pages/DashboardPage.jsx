@@ -202,7 +202,7 @@ function DashboardPage() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className={`flex items-center justify-center rounded-full w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
+            className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-brand-black sm:h-14 sm:w-14 transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
             >
               <img
                 src={filterIcon}
