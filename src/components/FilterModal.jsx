@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import ModalDialog from "./ModalDialog";
+import ModalField from "./ModalField";
 
 const FIELDS = [
   { id: "company", label: "Company", placeholder: "Company Name" },
@@ -13,123 +15,57 @@ const EMPTY_FILTERS = {
   sortOrder: "",
 };
 
-// Every field in the modal shares this look, so it's factored out rather
-// than repeated per field (see Field.jsx for the auth flow's equivalent).
-function ModalField({ label, type = "text", placeholder, value, onChange }) {
-  return (
-    <label className="flex flex-col gap-2">
-      <span className="font-medium text-brand-bg">{label}</span>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="min-w-0 rounded-full bg-input-bg px-5 py-3 text-brand-black outline-none placeholder:text-input-placeholder focus-visible:ring-2 focus-visible:ring-brand-yellow sm:py-3.5"
-      />
-    </label>
-  );
-}
-
 export default function FilterModal({ isOpen, onClose, onSubmit }) {
-    const dialogRef = useRef(null);
-    const [company, setCompany] = useState("");
-    const [role, setRole] = useState("");
-    const [location, setLocation] = useState("");
-    const [sortOrder, setSortOrder] = useState("");
-    useEffect(() => {
-        const dialog = dialogRef.current;
-        if (!dialog) return;
+    const [filters, setFilters] = useState({ ...EMPTY_FILTERS })
 
-        if (isOpen && !dialog.open) {
-        dialog.showModal();
-        } else if (!isOpen && dialog.open) {
-        dialog.close();
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        const dialog = dialogRef.current;
-        if (!dialog) return;
-
-        function handleNativeClose() {
-        onClose?.();
-        }
-
-        dialog.addEventListener("close", handleNativeClose);
-        return () => dialog.removeEventListener("close", handleNativeClose);
-    }, [onClose]);
-
-    const values = { company, location, role };
-    const setters = { company: setCompany, location: setLocation, role: setRole };
+    function handleChange(event) {
+        const { name, value } = event.target;
+        setFilters((currentFilters) => ({
+          ...currentFilters,
+          [name]: value,
+        }));
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
         onSubmit?.({
-          company: company.trim(),
-          location: location.trim(),
-          role: role.trim(),
-          sortOrder,
+          ...filters,
+          company: filters.company.trim(),
+          location: filters.location.trim(),
+          role: filters.role.trim(),
         });
-        dialogRef.current?.close();
     }
 
     function handleClear() {
-        setCompany("");
-        setLocation("");
-        setRole("");
-        setSortOrder("");
-        onSubmit?.({ ...EMPTY_FILTERS });
-        dialogRef.current?.close();
+        const emptyFilters = { ...EMPTY_FILTERS };
+        setFilters(emptyFilters);
+        onSubmit?.(emptyFilters);
     }
 
     return (
-        <dialog
-        ref={dialogRef}
-        aria-labelledby="modal-title"
-        className="h-full max-h-none w-full max-w-none overflow-y-auto bg-transparent p-0 backdrop:bg-white/55"
-        >
-        <div className="flex min-h-full w-full items-center justify-center px-3 py-8 sm:p-6">
-            <button
-            type="button"
-            aria-label="Close"
-            onClick={() => dialogRef.current?.close()}
-            className="absolute inset-0 cursor-default bg-transparent"
-        />
-
-        <div className="relative w-full max-w-120">
-          <div className="relative z-20 flex items-center justify-center">
-            <h2
-              id="modal-title"
-              className="text-center text-3xl font-bold tracking-tight text-brand-black sm:text-5xl"
-            >
-              APPLY FILTERS
-            </h2>
-          </div>
-
-            <div className="relative z-10 -mt-1 rounded-3xl bg-brand-black px-5 pb-6 pt-12 font-sans shadow-2xl sm:-mt-2 sm:rounded-[28px] sm:p-8 sm:pb-9 sm:pt-16">
-                <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
+      <ModalDialog isOpen={isOpen} onClose={onClose} title="APPLY FILTERS">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
                 {FIELDS.map((field) => (
                   <ModalField
                     key={field.id}
                     {...field}
-                    value={values[field.id]}
-                    onChange={(e) => setters[field.id](e.target.value)}
+                    value={filters[field.id]}
+                    onChange={handleChange}
                   />
                 ))}
 
                 {/* DROP DOWN BOX FOR SORT BY DUE DATE*/}
-                <label className="flex flex-col gap-2">
-                    <span className="font-medium text-brand-bg">Sort by due date</span>
-                    <select
-                        value={sortOrder}
-                        onChange={(event) => setSortOrder(event.target.value)}
-                        className="rounded-full bg-input-bg px-5 py-3 text-brand-black"
-                    >
+                <ModalField
+                  id="sortOrder"
+                  label="Sort by due date"
+                  as="select"
+                  value={filters.sortOrder}
+                  onChange={handleChange}
+                >
                         <option value="">Default order</option>
                         <option value="asc">Earliest first</option>
                         <option value="desc">Latest first</option>
-                    </select>
-                </label>
+                </ModalField>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                     <button
@@ -147,10 +83,7 @@ export default function FilterModal({ isOpen, onClose, onSubmit }) {
                     Clear filters
                     </button>
                 </div>
-                </form>
-          </div>
-        </div>
-      </div>
-    </dialog>
+        </form>
+      </ModalDialog>
   );
 }
