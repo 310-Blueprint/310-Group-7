@@ -31,7 +31,8 @@ a single place.
   drop or a file picker, then download or delete them. Files are stored
   privately, scoped to the account that uploaded them.
 - **Deadline reminders.** Applications due today or within two days appear in
-  the dashboard, with optional browser desktop alerts while Pipeline is open.
+  the dashboard. Users can enable desktop alerts, including scheduled push
+  notifications while Pipeline is closed when the deployment is configured.
 
 ### Planned for the next iteration
 
@@ -154,7 +155,7 @@ Technical documentation for contributors lives in [docs/](docs/):
 | [database.md](docs/database.md) | The Supabase schema and why row-level security matters |
 | [dashboard.md](docs/dashboard.md) | The kanban board and drag and drop |
 | [documents.md](docs/documents.md) | The documents archive and storage layout |
-| [notifications.md](docs/notifications.md) | Deadline reminders and desktop alerts |
+| [notifications.md](docs/notifications.md) | In-app reminders and background push alerts |
 | [ui-and-layout.md](docs/ui-and-layout.md) | Shared components, design tokens, and breakpoints |
 | [ROADMAP.md](docs/ROADMAP.md) | Known gaps and work planned for the next iteration |
 
