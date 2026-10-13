@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { describeDeadline } from '../lib/notifications'
 import { enablePushNotifications } from '../lib/pushNotifications'
 
@@ -15,13 +15,33 @@ function getLocalDateKey() {
   return `${year}-${month}-${day}`
 }
 
+function getReminderKey(application) {
+  return `${application.id}:${application.dueDate}`
+}
+
+function getDismissedReminders(userId) {
+  try {
+    const value = localStorage.getItem(`pipeline-dismissed-deadlines:${userId}`)
+    return new Set(JSON.parse(value ?? '[]'))
+  } catch {
+    return new Set()
+  }
+}
+
 function NotificationPanel({ reminders, userId, className = '' }) {
   const [permission, setPermission] = useState(getPermission)
   const [permissionError, setPermissionError] = useState('')
   const [pushStatus, setPushStatus] = useState('idle')
+  const [dismissedReminders, setDismissedReminders] = useState(() =>
+    getDismissedReminders(userId),
+  )
+  const visibleReminders = useMemo(
+    () => reminders.filter((application) => !dismissedReminders.has(getReminderKey(application))),
+    [dismissedReminders, reminders],
+  )
 
   useEffect(() => {
-    if (permission !== 'granted' || reminders.length === 0) return
+    if (permission !== 'granted' || visibleReminders.length === 0) return
 
     const storageKey = `pipeline-deadline-notifications:${userId ?? 'unknown-user'}`
     const todayKey = getLocalDateKey()
@@ -35,8 +55,8 @@ function NotificationPanel({ reminders, userId, className = '' }) {
 
     let changed = false
 
-    reminders.forEach((application) => {
-      const reminderKey = `${application.id}:${application.dueDate}`
+    visibleReminders.forEach((application) => {
+      const reminderKey = getReminderKey(application)
       if (sentNotifications[reminderKey] === todayKey) return
 
       try {
@@ -58,7 +78,22 @@ function NotificationPanel({ reminders, userId, className = '' }) {
         console.error('Desktop notification history could not be saved', error)
       }
     }
-  }, [permission, reminders, userId])
+  }, [permission, userId, visibleReminders])
+
+  function dismissReminder(application) {
+    const nextDismissedReminders = new Set(dismissedReminders)
+    nextDismissedReminders.add(getReminderKey(application))
+    setDismissedReminders(nextDismissedReminders)
+
+    try {
+      localStorage.setItem(
+        `pipeline-dismissed-deadlines:${userId}`,
+        JSON.stringify([...nextDismissedReminders]),
+      )
+    } catch (error) {
+      console.error('Dismissed deadline could not be saved', error)
+    }
+  }
 
   async function enableAlerts() {
     setPermissionError('')
@@ -81,16 +116,26 @@ function NotificationPanel({ reminders, userId, className = '' }) {
       className={`relative z-10 rounded-3xl bg-brand-yellow p-4 shadow-sm sm:p-5 ${className}`}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <h2 id="deadline-reminders-title" className="text-lg font-bold">
             Upcoming deadlines
           </h2>
-          {reminders.length > 0 ? (
-            <ul className="mt-1 space-y-1 text-sm">
-              {reminders.map((application) => (
-                <li key={application.id}>
-                  <strong>{application.company}</strong> — {application.role}{' '}
-                  {describeDeadline(application.daysUntilDue)}
+          {visibleReminders.length > 0 ? (
+            <ul className="mt-1 space-y-2 text-sm">
+              {visibleReminders.map((application) => (
+                <li key={application.id} className="flex flex-wrap items-center justify-between gap-2">
+                  <span>
+                    <strong>{application.company}</strong> — {application.role}{' '}
+                    {describeDeadline(application.daysUntilDue)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => dismissReminder(application)}
+                    aria-label={`Mark ${application.company} ${application.role} as done`}
+                    className="shrink-0 rounded-full border border-brand-black px-3 py-1 text-xs font-semibold transition hover:bg-brand-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
+                  >
+                    Mark done
+                  </button>
                 </li>
               ))}
             </ul>
@@ -109,11 +154,13 @@ function NotificationPanel({ reminders, userId, className = '' }) {
           {pushStatus === 'local-only' && (
             <p className="mt-2 text-xs">Desktop alerts work while Pipeline is open.</p>
           )}
+          {permission === 'granted' && pushStatus === 'idle' && (
+            <p className="mt-2 text-xs">Desktop alerts are enabled.</p>
+          )}
           {permissionError && <p className="mt-2 text-xs text-red-700">{permissionError}</p>}
         </div>
 
-        {(permission === 'default' ||
-          (permission === 'granted' && !['subscribed', 'local-only'].includes(pushStatus))) && (
+        {permission === 'default' && (
           <button
             type="button"
             onClick={enableAlerts}

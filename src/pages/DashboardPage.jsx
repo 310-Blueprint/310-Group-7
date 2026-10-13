@@ -220,7 +220,12 @@ function DashboardPage() {
         className={`${BEAVER_POSITION} z-0`}
       />
 
-      <NotificationPanel reminders={reminders} userId={user?.id} className="mb-4" />
+      <NotificationPanel
+        key={user?.id}
+        reminders={reminders}
+        userId={user?.id}
+        className="mb-4"
+      />
 
       <DndContext
         sensors={sensors}
