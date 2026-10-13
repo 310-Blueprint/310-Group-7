@@ -26,6 +26,7 @@ import {
 import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
 import filterIcon from '../assets/filter-svgrepo-com.svg'
+import FilterModal from '../components/FilterModal'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
@@ -61,6 +62,7 @@ function DashboardPage() {
   const [activeApplication, setActiveApplication] = useState(null)
   const [dragStartContainer, setDragStartContainer] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -200,8 +202,11 @@ function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/*FILTER BUTTON*/}
           <button
             type="button"
+            aria-label="Open filters."
+            onClick={() => setIsFilterOpen(true)}
             className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-brand-black sm:h-14 sm:w-14 transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
             >
               <img
@@ -211,6 +216,7 @@ function DashboardPage() {
               />
             </button>
 
+          {/*ADD APPLICATION BUTTON*/}
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
@@ -276,6 +282,11 @@ function DashboardPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddApplication}
+      />
+
+      <FilterModal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
       />
     </PageShell>
   )
