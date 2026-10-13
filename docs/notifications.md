@@ -9,6 +9,10 @@ are ignored.
 The dashboard always shows a yellow reminder panel. It lists upcoming deadlines
 or displays an empty-state message when there are none.
 
+Selecting **Mark done** hides only that reminder in the current browser and
+keeps it hidden after a refresh. It does not change the application's status or
+remove the application from the board.
+
 Selecting **Enable desktop alerts** opens the browser permission prompt. With a
 public VAPID key configured, Pipeline registers its service worker and saves the
 browser's push subscription in Supabase. Without that key, alerts work only
@@ -58,6 +62,10 @@ exposed. Redeploy after changing Netlify settings.
 Create unfinished applications due today, tomorrow, in two days, and in three
 days. Confirm only the first three appear, then move one to Offer and confirm it
 disappears.
+
+Select **Mark done** on one reminder and confirm only that reminder disappears.
+Refresh the page and confirm it stays hidden while the application remains on
+the board.
 
 Deploy the branch with all settings configured. Open the deployed URL, sign in,
 enable alerts, and confirm a subscription appears in Supabase. Close the tab and
