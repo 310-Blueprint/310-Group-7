@@ -25,6 +25,7 @@ import {
 } from '../lib/applications'
 import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
+import filterIcon from '../assets/filter-svgrepo-com.svg'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
@@ -197,13 +198,28 @@ function DashboardPage() {
             <p className="mt-1 text-xs text-red-600">Couldn't load applications. Try refreshing.</p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
-        >
-          + Add application
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className={`flex items-center justify-center rounded-full w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
+            >
+              <img
+                src={filterIcon}
+                alt="Filter button."
+                className="size-6"
+              />
+            </button>
+
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
+          >
+            + Add application
+          </button>
+        </div>
+
       </header>
 
       <img
