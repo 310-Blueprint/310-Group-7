@@ -250,6 +250,5 @@ There are no automated tests. Alongside `npm run lint`, `npm run build`, and
   do not reach the bundle, but they are around 500 KB of dead weight in the
   repository.
 - `public/favicon.svg` is no longer referenced and should be removed.
-- `src/App.css` is tracked but imported nowhere.
 
 See [ROADMAP.md](ROADMAP.md) for the full list.
