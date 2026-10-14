@@ -1,34 +1,12 @@
 // Wrapper used to display boxes over the page
 // used by the Add Application and Filter boxes
 
-import { useEffect, useId, useRef } from 'react'
+import { useId } from 'react'
+import useTaskDialog from './hooks/useTaskDialog'
 
 function ModalDialog({ isOpen, onClose, title, children, showCloseButton = false }) {
-  const dialogRef = useRef(null)
+  const dialogRef = useTaskDialog(isOpen, onClose)
   const titleId = useId()
-
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    if (isOpen && !dialog.open) {
-      dialog.showModal()
-    } else if (!isOpen && dialog.open) {
-      dialog.close()
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-
-    function handleNativeClose() {
-      onClose?.()
-    }
-
-    dialog.addEventListener('close', handleNativeClose)
-    return () => dialog.removeEventListener('close', handleNativeClose)
-  }, [onClose])
 
   return (
     <dialog
