@@ -12,6 +12,16 @@ export function celebrateCompletedTask() {
       ...options,
     })
 
-  fire({ particleCount: 60, spread: 55, angle: 60, origin: { x: 0.75, y: 0.65 } })
-  fire({ particleCount: 60, spread: 55, angle: 120, origin: { x: 0.75, y: 0.65 } })
+  fire({
+    particleCount: 60,
+    spread: 55,
+    angle: 60,
+    origin: { x: 0.75, y: 0.65 },
+  })
+  fire({
+    particleCount: 60,
+    spread: 55,
+    angle: 120,
+    origin: { x: 0.75, y: 0.65 },
+  })
 }

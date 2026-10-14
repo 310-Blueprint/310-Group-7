@@ -2,7 +2,8 @@ import Sidebar from './Sidebar'
 
 // Shared by Dashboard and Documents — same silhouette, same spot, on both
 // pages, so it lives here rather than being copy-pasted per page.
-export const BEAVER_POSITION = 'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
+export const BEAVER_POSITION =
+  'pointer-events-none absolute left-[35%] top-14 hidden w-31 xl:block'
 
 // The "+ Add ___" pill in each page's header. Both call sites append their
 // own width/interaction modifiers (a real <button> wants hover/focus states

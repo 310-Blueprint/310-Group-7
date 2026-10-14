@@ -8,19 +8,11 @@
  * @param {Function} props.onDelete - A function to call when the task is deleted.
  * @param {Function} props.onEdit - A function to call when the task is edited.
  */
-function TaskCard({
-  title,
-  description,
-  dueDate,
-  onDelete,
-  onEdit,
-}) {
+function TaskCard({ title, description, dueDate, onDelete, onEdit }) {
   return (
     <article className="rounded-2xl bg-white px-4 py-3.5 text-brand-black shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="break-words text-sm font-bold leading-tight">
-          {title}
-        </h3>
+        <h3 className="break-words text-sm font-bold leading-tight">{title}</h3>
 
         {onDelete && (
           <button
@@ -94,9 +86,7 @@ function TaskCard({
       )}
 
       {dueDate && (
-        <p className="mt-3 text-xs text-brand-black/55">
-          Due {dueDate}
-        </p>
+        <p className="mt-3 text-xs text-brand-black/55">Due {dueDate}</p>
       )}
     </article>
   )

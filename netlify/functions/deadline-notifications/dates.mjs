@@ -8,13 +8,17 @@ function dateKeyInNewZealand(date = new Date()) {
     month: '2-digit',
     day: '2-digit',
   }).formatToParts(date)
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  const values = Object.fromEntries(
+    parts.map((part) => [part.type, part.value])
+  )
   return `${values.year}-${values.month}-${values.day}`
 }
 
 function addDays(dateKey, days) {
   const date = new Date(`${dateKey}T00:00:00Z`)
-  return new Date(date.getTime() + days * DAY_IN_MILLISECONDS).toISOString().slice(0, 10)
+  return new Date(date.getTime() + days * DAY_IN_MILLISECONDS)
+    .toISOString()
+    .slice(0, 10)
 }
 
 export function describeDeadline(daysUntilDue) {

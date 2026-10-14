@@ -95,7 +95,7 @@ especially welcome.
 Until then, every pull request must be verified by hand, and **the pull request
 description must say what was verified**. At a minimum:
 
-- `npm run lint` passes.
+- `npm run codestyle` passes.
 - `npm run build` passes.
 - The app runs and the affected flows behave as expected.
 
@@ -147,7 +147,7 @@ All pull requests must be reviewed by **at least one other team member**. As a
 reviewer you should:
 
 - Pull the branch and run the code, confirming it works as described.
-- Run `npm run lint` and `npm run build`.
+- Run `npm run codestyle` and `npm run build`.
 - Check the code is clear, commented where it needs to be, and maintainable.
 - Check the pull request says what was manually verified.
 - Check that any behaviour change is reflected in the relevant document in

@@ -8,7 +8,11 @@
  * an auth card, since all three pages want the same thing — pass your own to
  * override. The button's own look is fixed here so it can't drift per page.
  */
-function AuthButton({ children, className = 'mb-5 sm:mx-12 md:mx-20', ...buttonProps }) {
+function AuthButton({
+  children,
+  className = 'mb-5 sm:mx-12 md:mx-20',
+  ...buttonProps
+}) {
   return (
     <div className={className}>
       <button

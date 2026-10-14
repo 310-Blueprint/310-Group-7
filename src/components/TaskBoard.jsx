@@ -5,7 +5,14 @@ import { DUE_SOON_COLUMN, TASK_COLUMNS } from '../lib/taskBoard'
 import useTaskDragAndDrop from './hooks/useTaskDragAndDrop'
 
 // Renders the task columns
-function TaskBoard({ tasks, dueSoonTasks, setTasks, setSaveError, onEditTask, onDeleteTask }) {
+function TaskBoard({
+  tasks,
+  dueSoonTasks,
+  setTasks,
+  setSaveError,
+  onEditTask,
+  onDeleteTask,
+}) {
   const drag = useTaskDragAndDrop({ tasks, setTasks, setSaveError })
 
   return (

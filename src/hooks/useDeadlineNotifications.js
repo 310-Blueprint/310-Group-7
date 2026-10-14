@@ -3,7 +3,8 @@ import { describeDeadline } from '../lib/notifications'
 import { enablePushNotifications } from '../lib/pushNotifications'
 
 function getPermission() {
-  if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported'
+  if (typeof window === 'undefined' || !('Notification' in window))
+    return 'unsupported'
   return Notification.permission
 }
 
@@ -42,7 +43,7 @@ function showDesktopNotification(application) {
     {
       body: application.role,
       tag: `application-deadline-${application.id}`,
-    },
+    }
   )
 }
 
@@ -79,11 +80,14 @@ export default function useDeadlineNotifications(reminders, userId) {
   const [permissionError, setPermissionError] = useState('')
   const [pushStatus, setPushStatus] = useState('idle')
   const [dismissedReminders, setDismissedReminders] = useState(() =>
-    getDismissedReminders(userId),
+    getDismissedReminders(userId)
   )
   const visibleReminders = useMemo(
-    () => reminders.filter((application) => !dismissedReminders.has(getReminderKey(application))),
-    [dismissedReminders, reminders],
+    () =>
+      reminders.filter(
+        (application) => !dismissedReminders.has(getReminderKey(application))
+      ),
+    [dismissedReminders, reminders]
   )
 
   useEffect(() => {
@@ -99,7 +103,7 @@ export default function useDeadlineNotifications(reminders, userId) {
       try {
         localStorage.setItem(
           `pipeline-dismissed-deadlines:${userId}`,
-          JSON.stringify([...nextReminders]),
+          JSON.stringify([...nextReminders])
         )
       } catch (error) {
         console.error('Dismissed deadline could not be saved', error)
@@ -120,7 +124,9 @@ export default function useDeadlineNotifications(reminders, userId) {
     } catch {
       setPermission(getPermission())
       setPushStatus('failed')
-      setPermissionError('Background alerts could not be enabled. In-app alerts still work.')
+      setPermissionError(
+        'Background alerts could not be enabled. In-app alerts still work.'
+      )
     }
   }
 

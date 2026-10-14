@@ -75,7 +75,7 @@ function App() {
             <TaskListPage />
           </ProtectedRoute>
         }
-/>
+      />
       <Route
         path="/calendar"
         element={

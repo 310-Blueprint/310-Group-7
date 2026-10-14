@@ -1,8 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 import SortableTaskCard from './SortableTaskCard'
 import TaskCard from './TaskCard'
@@ -47,12 +44,7 @@ function TaskColumn({
         }`}
       >
         {readOnly ? (
-          tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              {...task}
-            />
-          ))
+          tasks.map((task) => <TaskCard key={task.id} {...task} />)
         ) : (
           <SortableContext
             items={tasks.map((task) => task.id)}

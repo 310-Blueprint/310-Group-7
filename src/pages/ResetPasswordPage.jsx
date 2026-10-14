@@ -45,7 +45,7 @@ function ResetPasswordPage() {
 
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       setErrorMessage(
-        `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`,
+        `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`
       )
       return
     }
@@ -131,7 +131,11 @@ function ResetPasswordPage() {
         </AuthButton>
       </form>
 
-      <AuthFooter prompt="Changed your mind?" linkText="Back to log in" to="/" />
+      <AuthFooter
+        prompt="Changed your mind?"
+        linkText="Back to log in"
+        to="/"
+      />
     </AuthCard>
   )
 }

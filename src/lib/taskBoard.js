@@ -27,7 +27,7 @@ export function findTaskColumn(tasks, id) {
   if (Object.hasOwn(tasks, id)) return id
 
   return Object.keys(tasks).find((columnId) =>
-    tasks[columnId].some((task) => task.id === id),
+    tasks[columnId].some((task) => task.id === id)
   )
 }
 

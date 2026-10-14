@@ -21,7 +21,7 @@ The steps a reviewer should follow to see this working.
 
 The project has no automated tests yet, so say what you actually checked.
 
-- [ ] `npm run lint` passes
+- [ ] `npm run codestyle` passes
 - [ ] `npm run build` passes
 - [ ] Ran the app and confirmed the affected flows work
 - [ ] Checked the relevant checklist in `docs/`

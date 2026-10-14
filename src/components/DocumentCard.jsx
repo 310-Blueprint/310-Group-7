@@ -7,7 +7,9 @@ function DocumentCard({ id, name, url, onDelete }) {
     <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 sm:px-5 sm:py-4">
       <div className="flex min-w-0 items-center gap-3">
         <img src={documentIcon} alt="" className="size-7 shrink-0 sm:size-8" />
-        <span className="truncate text-sm font-semibold text-brand-black sm:text-base">{name}</span>
+        <span className="truncate text-sm font-semibold text-brand-black sm:text-base">
+          {name}
+        </span>
       </div>
 
       <div className="flex shrink-0 items-center gap-2">

@@ -8,7 +8,8 @@ function groupSubscriptionsByUser(subscriptions) {
   const subscriptionsByUser = new Map()
 
   subscriptions.forEach((subscription) => {
-    const userSubscriptions = subscriptionsByUser.get(subscription.user_id) ?? []
+    const userSubscriptions =
+      subscriptionsByUser.get(subscription.user_id) ?? []
     userSubscriptions.push(subscription)
     subscriptionsByUser.set(subscription.user_id, userSubscriptions)
   })
@@ -19,15 +20,18 @@ function groupSubscriptionsByUser(subscriptions) {
 function createDeliveryJobs(applications, subscriptions, deliveries) {
   const deliveredToday = new Set(
     deliveries.map((delivery) =>
-      deliveryKey(delivery.application_id, delivery.push_subscription_id),
-    ),
+      deliveryKey(delivery.application_id, delivery.push_subscription_id)
+    )
   )
   const subscriptionsByUser = groupSubscriptionsByUser(subscriptions)
 
   return applications.flatMap((application) => {
     const userSubscriptions = subscriptionsByUser.get(application.user_id) ?? []
     return userSubscriptions
-      .filter((subscription) => !deliveredToday.has(deliveryKey(application.id, subscription.id)))
+      .filter(
+        (subscription) =>
+          !deliveredToday.has(deliveryKey(application.id, subscription.id))
+      )
       .map((subscription) => ({ application, subscription }))
   })
 }
@@ -41,7 +45,7 @@ function createPushSubscription(subscription) {
 
 function createPayload(application, today) {
   const daysUntilDue = Math.round(
-    (Date.parse(application.due_date) - Date.parse(today)) / DAY_IN_MILLISECONDS,
+    (Date.parse(application.due_date) - Date.parse(today)) / DAY_IN_MILLISECONDS
   )
 
   return JSON.stringify({
@@ -59,7 +63,7 @@ async function deliverNotification(sendNotification, job, today) {
     await sendNotification(
       createPushSubscription(subscription),
       createPayload(application, today),
-      { TTL: 24 * 60 * 60, urgency: 'high' },
+      { TTL: 24 * 60 * 60, urgency: 'high' }
     )
 
     return {
@@ -88,15 +92,15 @@ export async function dispatchNotifications({
 }) {
   const jobs = createDeliveryJobs(applications, subscriptions, deliveries)
   const outcomes = await Promise.all(
-    jobs.map((job) => deliverNotification(sendNotification, job, today)),
+    jobs.map((job) => deliverNotification(sendNotification, job, today))
   )
 
   return {
     successfulDeliveries: outcomes.flatMap((outcome) =>
-      outcome.delivery ? [outcome.delivery] : [],
+      outcome.delivery ? [outcome.delivery] : []
     ),
     expiredSubscriptionIds: outcomes.flatMap((outcome) =>
-      outcome.expiredSubscriptionId ? [outcome.expiredSubscriptionId] : [],
+      outcome.expiredSubscriptionId ? [outcome.expiredSubscriptionId] : []
     ),
   }
 }

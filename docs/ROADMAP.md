@@ -82,19 +82,7 @@ render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 
 ## Housekeeping
 
-- Remove `@dnd-kit/dom` from `package.json`. It is declared but imported
-  nowhere.
-- Remove `src/App.css`. It is tracked but imported nowhere.
-- Remove `public/favicon.svg`. `index.html` points at `favicon.png` instead.
-- Remove `src/assets/leaf1.png`, `leaf2.png`, and `logo.png`, which are imported
-  nowhere and are around 500 KB of dead weight in the repository.
-- Re-export `beaver.png` (651 KB) and `beaverArms.png` (205 KB) as SVG, like the
-  grass already is. They are most of the bundle. See
-  [ui-and-layout.md](ui-and-layout.md).
-- Add Prettier and an `.editorconfig`. Formatting is inconsistent across the
-  codebase: most files use two-space indentation and no semicolons, while
-  `src/components/ApplicationModal.jsx` uses four spaces, semicolons, and double
-  quotes.
+- Nothing so far!
 
 ## Planned for A2
 

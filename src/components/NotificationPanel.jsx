@@ -24,7 +24,10 @@ function NotificationPanel({ reminders, userId, className = '' }) {
           {visibleReminders.length > 0 ? (
             <ul className="mt-1 space-y-2 text-sm">
               {visibleReminders.map((application) => (
-                <li key={application.id} className="flex flex-wrap items-center justify-between gap-2">
+                <li
+                  key={application.id}
+                  className="flex flex-wrap items-center justify-between gap-2"
+                >
                   <span>
                     <strong>{application.company}</strong> — {application.role}{' '}
                     {describeDeadline(application.daysUntilDue)}
@@ -41,24 +44,36 @@ function NotificationPanel({ reminders, userId, className = '' }) {
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-sm">No application deadlines in the next two days.</p>
+            <p className="mt-1 text-sm">
+              No application deadlines in the next two days.
+            </p>
           )}
           {permission === 'denied' && (
-            <p className="mt-2 text-xs">Desktop alerts are blocked in your browser settings.</p>
+            <p className="mt-2 text-xs">
+              Desktop alerts are blocked in your browser settings.
+            </p>
           )}
           {permission === 'unsupported' && (
-            <p className="mt-2 text-xs">This browser does not support desktop alerts.</p>
+            <p className="mt-2 text-xs">
+              This browser does not support desktop alerts.
+            </p>
           )}
           {pushStatus === 'subscribed' && (
-            <p className="mt-2 text-xs">Background deadline alerts are enabled.</p>
+            <p className="mt-2 text-xs">
+              Background deadline alerts are enabled.
+            </p>
           )}
           {pushStatus === 'local-only' && (
-            <p className="mt-2 text-xs">Desktop alerts work while Pipeline is open.</p>
+            <p className="mt-2 text-xs">
+              Desktop alerts work while Pipeline is open.
+            </p>
           )}
           {permission === 'granted' && pushStatus === 'idle' && (
             <p className="mt-2 text-xs">Desktop alerts are enabled.</p>
           )}
-          {permissionError && <p className="mt-2 text-xs text-red-700">{permissionError}</p>}
+          {permissionError && (
+            <p className="mt-2 text-xs text-red-700">{permissionError}</p>
+          )}
         </div>
 
         {permission === 'default' && (
