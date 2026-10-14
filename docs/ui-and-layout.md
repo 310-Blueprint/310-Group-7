@@ -45,6 +45,11 @@ List pages, and carries the sign-out control.
 and content frame. The Dashboard, Documents, and Task List pages supply their
 own headers, board or panel content, and decorative images as children.
 
+**`PageGreeting`** provides the shared page heading and description used by the
+Dashboard, Documents, Task List, and Calendar pages. It renders the consistent
+“Hello, Busy Beaver” greeting and accepts optional children for page-specific
+loading, error, or status messages.
+
 **`TaskColumn`** renders a Task List column with a heading and task count. The
 three main columns contain sortable cards; Due Soon displays the same card
 style in read-only form without edit or delete controls.
@@ -173,6 +178,8 @@ narrow screens.
 `CalendarPage.jsx` has no fixed minimum width and no fixed viewport height, so
 the page grows and scrolls when its content is taller than the viewport.
 
+- The page heading is rendered through the shared `PageGreeting` component,
+  with loading and application-fetch errors shown beneath the description.
 - The calendar grids grow/shrink based on how many items are in it.
 - If a row grows due to its item count, the other rows will shrink in response.
 - Previous and next month controls use the shared dark, rounded button style,

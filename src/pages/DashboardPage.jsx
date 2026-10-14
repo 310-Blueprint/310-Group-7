@@ -9,17 +9,14 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
-import confetti from 'canvas-confetti'
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
 import ApplicationCard from '../components/ApplicationCard'
 import ApplicationModal from '../components/ApplicationModal'
 import NotificationPanel from '../components/NotificationPanel'
-import PageShell, {
-  BEAVER_POSITION,
-  PRIMARY_PILL_CLASSES,
-} from '../components/PageShell'
+import PageGreeting from '../components/PageGreeting'
+import PageShell, { BEAVER_POSITION, PRIMARY_PILL_CLASSES } from '../components/PageShell'
 import StatusColumn from '../components/StatusColumn'
 import {
   deleteApplication,
@@ -32,13 +29,10 @@ import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
 import filterIcon from '../assets/filter-svgrepo-com.svg'
 import FilterModal from '../components/FilterModal'
+import { celebrateCompletedTask } from '../lib/celebrationEffect'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
-// Mirrors brand-yellow/blue/pink/green in src/styles/preset.css — canvas-confetti
-// needs literal color strings, so these can't reference the CSS custom
-// properties directly. Keep in sync if the palette changes.
-const CONFETTI_COLORS = ['#F5E0AE', '#A6C2D2', '#D9BFB1', '#B8D2C7']
 const EMPTY_ITEMS = COLUMNS.reduce(
   (acc, column) => ({ ...acc, [column.id]: [] }),
   {}
@@ -86,29 +80,6 @@ function filterItems(items, filters) {
   }
 
   return visibleItems
-}
-
-function celebrateOffer() {
-  const fire = (options) =>
-    confetti({
-      origin: { y: 0.65 },
-      colors: CONFETTI_COLORS,
-      disableForReducedMotion: true,
-      ...options,
-    })
-
-  fire({
-    particleCount: 60,
-    spread: 55,
-    angle: 60,
-    origin: { x: 0.75, y: 0.65 },
-  })
-  fire({
-    particleCount: 60,
-    spread: 55,
-    angle: 120,
-    origin: { x: 0.75, y: 0.65 },
-  })
 }
 
 function DashboardPage() {
@@ -248,7 +219,7 @@ function DashboardPage() {
         nextItems[startContainer]
       ).catch((error) => console.error('Failed to save card position', error))
 
-      if (overContainer === OFFER_COLUMN) celebrateOffer()
+      if (overContainer === OFFER_COLUMN) celebrateCompletedTask()
     }
   }
 
@@ -286,11 +257,7 @@ function DashboardPage() {
   return (
     <PageShell>
       <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Hello, Stranger<span aria-hidden="true">✦</span>
-          </h1>
-          <p className="mt-1 text-base">Welcome to your internship dashboard</p>
+        <PageGreeting description="Welcome to your internship dashboard">
           {isLoading && (
             <p className="mt-1 text-xs text-brand-black/60">
               Loading your applications…
@@ -301,7 +268,7 @@ function DashboardPage() {
               Couldn't load applications. Try refreshing.
             </p>
           )}
-        </div>
+        </PageGreeting>
 
         <div className="flex items-center gap-2">
           {/*FILTER BUTTON*/}

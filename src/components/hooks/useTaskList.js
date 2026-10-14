@@ -12,7 +12,7 @@ import {
   getDueSoonTasks,
   isTaskStatus,
 } from '../../lib/taskBoard'
-import { celebrateCompletedTask } from '../../lib/taskCelebration'
+import { celebrateCompletedTask } from '../../lib/celebrationEffect'
 
 // Owns task data and the add/edit modal.
 export default function useTaskList() {
