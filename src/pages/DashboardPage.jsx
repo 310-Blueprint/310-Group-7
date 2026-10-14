@@ -16,6 +16,7 @@ import grassDouble from '../assets/grassDouble.svg'
 import ApplicationCard from '../components/ApplicationCard'
 import ApplicationModal from '../components/ApplicationModal'
 import NotificationPanel from '../components/NotificationPanel'
+import PageGreeting from '../components/PageGreeting'
 import PageShell, { BEAVER_POSITION, PRIMARY_PILL_CLASSES } from '../components/PageShell'
 import StatusColumn from '../components/StatusColumn'
 import {
@@ -256,16 +257,18 @@ function DashboardPage() {
   return (
     <PageShell>
       <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Hello, Stranger<span aria-hidden="true">✦</span>
-          </h1>
-          <p className="mt-1 text-base">Welcome to your internship dashboard</p>
-          {isLoading && <p className="mt-1 text-xs text-brand-black/60">Loading your applications…</p>}
-          {loadError && (
-            <p className="mt-1 text-xs text-red-600">Couldn't load applications. Try refreshing.</p>
+        <PageGreeting description="Welcome to your internship dashboard">
+          {isLoading && (
+            <p className="mt-1 text-xs text-brand-black/60">
+              Loading your applications…
+            </p>
           )}
-        </div>
+          {loadError && (
+            <p className="mt-1 text-xs text-red-600">
+              Couldn't load applications. Try refreshing.
+            </p>
+          )}
+        </PageGreeting>
 
         <div className="flex items-center gap-2">
           {/*FILTER BUTTON*/}

@@ -7,6 +7,7 @@ import {
 } from '../lib/applications'
 import CalendarDay from '../components/CalendarDay'
 import useTaskList from '../components/hooks/useTaskList'
+import PageGreeting from '../components/PageGreeting'
 
 const EMPTY_ITEMS = new Map()
 
@@ -112,16 +113,18 @@ function CalendarPage() {
   return (
     <PageShell>
       <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Hello, Stranger<span aria-hidden="true">✦</span>
-          </h1>
-          <p className="mt-1 text-base">Welcome to your calendar</p>
-          {isLoading && <p className="mt-1 text-xs text-brand-black/60">Loading your calendar…</p>}
+      <PageGreeting description="Welcome to your calendar">
+        {isLoading && (
+          <p className="mt-1 text-xs text-brand-black/60">
+            Loading your calendar…
+          </p>
+        )}
           {loadError && (
-            <p className="mt-1 text-xs text-red-600">Couldn't load calendar. Try refreshing.</p>
-          )}
-        </div>
+          <p className="mt-1 text-xs text-red-600">
+            Couldn't load calendar. Try refreshing.
+          </p>
+        )}
+      </PageGreeting>
         <div className="flex flex-col justify-between items-end min-w-2xs mt-auto">
           <h2>{MONTHS[month]} {year}</h2>
           <div>

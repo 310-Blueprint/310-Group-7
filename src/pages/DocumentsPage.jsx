@@ -3,6 +3,7 @@ import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import FormMessage from '../components/FormMessage'
+import PageGreeting from '../components/PageGreeting'
 import PageShell, { BEAVER_POSITION, PRIMARY_PILL_CLASSES } from '../components/PageShell'
 import useAuth from '../context/useAuth'
 import { supabase } from '../lib/supabaseClient'
@@ -167,14 +168,9 @@ function DocumentsPage() {
 
   return (
     <PageShell>
-      <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Hello, Stranger<span aria-hidden="true">✦</span>
-          </h1>
-          <p className="mt-1 text-base">Welcome to your documents archive</p>
-        </div>
-        <label
+    <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
+      <PageGreeting description="Welcome to your documents archive" />
+      <label
           htmlFor="document-upload-input"
           className={`cursor-pointer sm:w-auto ${PRIMARY_PILL_CLASSES}`}
         >

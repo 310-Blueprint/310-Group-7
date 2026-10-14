@@ -1,6 +1,7 @@
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
+import PageGreeting from '../components/PageGreeting'
 import PageShell, {
   BEAVER_POSITION,
   PRIMARY_PILL_CLASSES,
@@ -23,16 +24,11 @@ function TaskListContent() {
 
   return (
     <PageShell>
-      <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Hello, Stranger<span aria-hidden="true">✦</span>
-          </h1>
-          <p className="mt-1 text-base">Welcome to your task dashboard</p>
-
-          {taskList.isLoading && (
-            <output className="mt-1 text-xs text-brand-black/60">
-              Loading your tasks…
+    <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
+      <PageGreeting description="Welcome to your task dashboard">
+        {taskList.isLoading && (
+          <output className="mt-1 text-xs text-brand-black/60">
+            Loading your tasks…
             </output>
           )}
           {taskList.loadError && (
@@ -45,7 +41,7 @@ function TaskListContent() {
               {taskList.saveError}
             </p>
           )}
-        </div>
+        </PageGreeting>
 
         <button
           type="button"
