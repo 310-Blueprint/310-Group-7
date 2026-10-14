@@ -82,8 +82,6 @@ render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 
 ## Housekeeping
 
-- Remove `src/assets/leaf1.png`, `leaf2.png`, and `logo.png`, which are imported
-  nowhere and are around 500 KB of dead weight in the repository.
 - Re-export `beaver.png` (651 KB) and `beaverArms.png` (205 KB) as SVG, like the
   grass already is. They are most of the bundle. See
   [ui-and-layout.md](ui-and-layout.md).
