@@ -38,12 +38,25 @@ mark is `aria-hidden` with an empty `alt`, because the word beside it already
 carries the name. It is shared by the sidebar, the auth card, and the
 route-loading screen, so changing it changes all three.
 
-**`Sidebar`** is the app navigation for the dashboard, documents, and Task
-List pages, and carries the sign-out control.
+**`Sidebar`** is the app navigation for the Dashboard, Documents, Task List,
+Calendar, and Analytics pages, and carries the sign-out control.
 
 **`PageShell`** provides the authenticated pages' shared background, sidebar,
-and content frame. The Dashboard, Documents, and Task List pages supply their
-own headers, board or panel content, and decorative images as children.
+and content frame. The Dashboard, Documents, Task List, and Analytics pages
+supply their own headers, board or panel content, and decorative images as
+children.
+
+**`StatCard`** shows one headline number with a label and an optional caption.
+`tone` takes a background token and defaults to `bg-white`.
+
+**`ChartPanel`** is a titled white panel for a chart. Its `<section>` is
+labelled by its own heading through `useId`, so several panels can share a page.
+
+**`ChartBar`** is one labelled horizontal bar inside a `ChartPanel` list. It
+renders an `<li>`, so place it in a `<ul>` or `<ol>`. The value is visible text
+and the bar is `aria-hidden`, so a chart reads correctly without the graphic.
+`fraction` is clamped to 0–1; its width is the one inline style, because
+Tailwind cannot generate runtime percentages.
 
 **`TaskColumn`** renders a Task List column with a heading and task count. The
 three main columns contain sortable cards; Due Soon displays the same card
@@ -156,6 +169,21 @@ and at `xl` all four visual columns appear side by side.
 
 For task data, status changes, ordering, and completion confetti, see
 [task-list.md](task-list.md).
+
+### Analytics
+
+`AnalyticsPage.jsx` reuses `PageShell` and the split beaver artwork, which is
+hidden below `xl`. It has a heading but no header action.
+
+- The four stat cards go one, then two, then four across, matching the board.
+- The stage breakdown and funnel panels stack until `lg` and then sit side by
+  side.
+- Stage bars use each board column's own tone. The funnel uses `bg-link`
+  because it is a single series, not the board's stages.
+- The empty state fills the content area with its "Go to dashboard" link
+  centred.
+
+For the metrics themselves, see [job-analytics.md](job-analytics.md).
 
 ### Documents page
 

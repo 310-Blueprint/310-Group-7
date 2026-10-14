@@ -62,8 +62,17 @@ The status mapping is the important half:
 
 `rejected` is allowed by the CHECK constraint but has no entry in
 `STATUS_BY_COLUMN` and no column in `src/pages/dashboardData.js`. A row with
-that status is silently invisible in the UI. Either add a fifth column or drop
-the value from the constraint; see [ROADMAP.md](ROADMAP.md).
+that status is silently invisible on the board, and Job Analytics counts it as
+sent but no further. Either add a fifth column or drop the value from the
+constraint; see [ROADMAP.md](ROADMAP.md).
+
+### Read by Job Analytics
+
+The analytics page at `/analytics` reads this table through the same
+`fetchApplications()` call as the board, and never writes to it. Only the
+current `status` is stored, with no history of earlier stages, so analytics
+infers the furthest stage an application reached from where it is now. See
+[job-analytics.md](job-analytics.md).
 
 The board's column titles are defined once in `src/pages/dashboardData.js`. If
 you add or rename a column there, update `STATUS_BY_COLUMN` and the CHECK
@@ -164,6 +173,8 @@ than a column. That is described in [documents.md](documents.md).
 ## Future work
 
 - `rejected` status has no board column, so those rows are invisible.
+- Application status changes are not recorded, which limits what analytics can
+  measure.
 - The `documents` table is unused; document metadata is derived from the storage
   path instead.
 
