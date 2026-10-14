@@ -16,6 +16,8 @@ const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
+const MONTH_BUTTON_CLASSES =
+  'inline-flex items-center gap-2 rounded-full bg-brand-black px-4 py-2 text-sm font-semibold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black'
 
 function groupByDate(applications) {
   return new Map(
@@ -113,25 +115,63 @@ function CalendarPage() {
   return (
     <PageShell>
       <header className="mb-6 flex flex-col gap-4 px-1 pt-2 sm:flex-row sm:items-start sm:justify-between sm:px-2 md:pt-7 lg:pt-9">
-      <PageGreeting description="Welcome to your calendar">
-        {isLoading && (
-          <p className="mt-1 text-xs text-brand-black/60">
-            Loading your calendar…
-          </p>
-        )}
+          <PageGreeting description="Welcome to your calendar">
+            {isLoading && (
+              <p className="mt-1 text-xs text-brand-black/60">
+                Loading your calendar…
+              </p>
+            )}
           {loadError && (
-          <p className="mt-1 text-xs text-red-600">
-            Couldn't load calendar. Try refreshing.
-          </p>
-        )}
-      </PageGreeting>
-        <div className="flex flex-col justify-between items-end min-w-2xs mt-auto">
-          <h2>{MONTHS[month]} {year}</h2>
-          <div>
-            <button onClick={handlePrevMonth} className="px-2 bg-gray-300 hover:bg-gray-400 rounded-l">Prev</button>
-            <button onClick={handleNextMonth} className="px-2 px-2 bg-gray-300 hover:bg-gray-400 rounded-r">Next</button>
+              <p className="mt-1 text-xs text-red-600">
+                Couldn't load calendar. Try refreshing.
+              </p>
+            )}
+          </PageGreeting>
+          <div className="mt-auto flex w-full flex-col gap-2 sm:w-auto sm:items-end">
+            <h2 aria-live="polite" className="text-xl font-bold">
+              {MONTHS[month]} {year}
+            </h2>
+            <nav aria-label="Calendar month navigation" className="flex gap-2">
+              <button
+                type="button"
+                onClick={handlePrevMonth}
+                aria-label={`Show ${MONTHS[prevMonth]} ${prevYear}`}
+                className={MONTH_BUTTON_CLASSES}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  aria-hidden="true"
+                >
+                  <path d="M10 3 5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={handleNextMonth}
+                aria-label={`Show ${MONTHS[nextMonth]} ${nextYear}`}
+                className={MONTH_BUTTON_CLASSES}
+              >
+                Next
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  aria-hidden="true"
+                >
+                  <path d="m6 3 5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </nav>
           </div>
-        </div>
       </header>
 
       <img
