@@ -82,9 +82,6 @@ render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 
 ## Housekeeping
 
-- Re-export `beaver.png` (651 KB) and `beaverArms.png` (205 KB) as SVG, like the
-  grass already is. They are most of the bundle. See
-  [ui-and-layout.md](ui-and-layout.md).
 - Add Prettier and an `.editorconfig`. Formatting is inconsistent across the
   codebase: most files use two-space indentation and no semicolons, while
   `src/components/ApplicationModal.jsx` uses four spaces, semicolons, and double

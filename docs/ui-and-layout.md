@@ -242,8 +242,6 @@ There are no automated tests. Alongside `npm run lint`, `npm run build`, and
 
 ## Future work
 
-- `beaver.png` (651 KB) and `beaverArms.png` (205 KB) are most of the bundle and
-  should be re-exported as SVG, like the grass already is.
-- `public/favicon.svg` is no longer referenced and should be removed.
+- None as of yet.
 
 See [ROADMAP.md](ROADMAP.md) for the full list.
