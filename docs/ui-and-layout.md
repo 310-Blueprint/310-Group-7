@@ -63,9 +63,7 @@ session is being restored.
 
 ## Favicon and branding
 
-`index.html` points at `/favicon.png`, served from `public/favicon.png`. The
-older `public/favicon.svg` is no longer referenced and should be removed; see
-[ROADMAP.md](ROADMAP.md).
+`index.html` points at `/favicon.png`, served from `public/favicon.png`.
 
 ## The layering
 
@@ -253,12 +251,6 @@ There are no automated tests. Alongside `npm run lint`, `npm run build`, and
 
 ## Future work
 
-- `beaver.png` (651 KB) and `beaverArms.png` (205 KB) are most of the bundle and
-  should be re-exported as SVG, like the grass already is.
-- `src/assets/leaf1.png`, `leaf2.png`, and `logo.png` are imported nowhere. They
-  do not reach the bundle, but they are around 500 KB of dead weight in the
-  repository.
-- `public/favicon.svg` is no longer referenced and should be removed.
-- `src/App.css` is tracked but imported nowhere.
+- None as of yet.
 
 See [ROADMAP.md](ROADMAP.md) for the full list.

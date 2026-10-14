@@ -7,11 +7,48 @@ const NAV_ITEMS = [
     label: 'Dashboard',
     to: '/dashboard',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
-        <rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="1.8" />
-        <rect x="13" y="3" width="8" height="5" rx="2" stroke="currentColor" strokeWidth="1.8" />
-        <rect x="13" y="10" width="8" height="11" rx="2" stroke="currentColor" strokeWidth="1.8" />
-        <rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="1.8" />
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="size-5"
+        aria-hidden="true"
+      >
+        <rect
+          x="3"
+          y="3"
+          width="8"
+          height="8"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <rect
+          x="13"
+          y="3"
+          width="8"
+          height="5"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <rect
+          x="13"
+          y="10"
+          width="8"
+          height="11"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <rect
+          x="3"
+          y="13"
+          width="8"
+          height="8"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
       </svg>
     ),
   },
@@ -19,37 +56,61 @@ const NAV_ITEMS = [
     label: 'Documents',
     to: '/documents',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="size-5"
+        aria-hidden="true"
+      >
         <path
           d="M6 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 5 19V5A1.5 1.5 0 0 1 6.5 3.5Z"
           stroke="currentColor"
           strokeWidth="1.8"
           strokeLinejoin="round"
         />
-        <path d="M14 3.5V8h4.5" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path
+          d="M14 3.5V8h4.5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
       </svg>
     ),
   },
   {
-  label: 'Task List',
-  to: '/tasks',
-  icon: (
-    <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
-      <path
-        d="M3 6l2 2 3-4M3 12l2 2 3-4M3 18l2 2 3-4M12 6h9M12 12h9M12 18h9"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  ),
-},
+    label: 'Task List',
+    to: '/tasks',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className="size-5"
+        aria-hidden="true"
+      >
+        <path
+          d="M3 6l2 2 3-4M3 12l2 2 3-4M3 18l2 2 3-4M12 6h9M12 12h9M12 18h9"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
   {
     label: 'Calendar',
     to: '/calendar',
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -79,7 +140,9 @@ function Sidebar() {
             to={to}
             className={({ isActive }) =>
               `${PILL_CLASSES} ${
-                isActive ? 'bg-white text-brand-black' : 'text-white hover:bg-white/10'
+                isActive
+                  ? 'bg-white text-brand-black'
+                  : 'text-white hover:bg-white/10'
               }`
             }
           >
@@ -96,7 +159,12 @@ function Sidebar() {
         onClick={handleSignOut}
         className={`${PILL_CLASSES} cursor-pointer text-white hover:bg-white/10 md:mt-auto`}
       >
-        <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="size-5"
+          aria-hidden="true"
+        >
           <path
             d="M15 4.5h2.5A1.5 1.5 0 0 1 19 6v12a1.5 1.5 0 0 1-1.5 1.5H15"
             stroke="currentColor"

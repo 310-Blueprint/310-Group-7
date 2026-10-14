@@ -10,9 +10,9 @@ export const COLUMNS = [
 
 export function groupByStatus(applications, columns) {
   return Object.fromEntries(
-      columns.map((column) => [
-        column.id,
-        applications.filter((application) => application.status === column.id),
-      ]),
+    columns.map((column) => [
+      column.id,
+      applications.filter((application) => application.status === column.id),
+    ])
   )
 }

@@ -1,7 +1,7 @@
-function CalendarTaskEntry({
-  task
-}) {
-  const status = (task.status.charAt(0).toUpperCase() + task.status.slice(1)).replace("_", " ");
+function CalendarTaskEntry({ task }) {
+  const status = (
+    task.status.charAt(0).toUpperCase() + task.status.slice(1)
+  ).replace('_', ' ')
   const cols = new Map([
     ['todo', 'border-sky-300'],
     ['in_progress', 'border-red-300'],
@@ -13,8 +13,9 @@ function CalendarTaskEntry({
   ])
 
   return (
-    <div className={`rounded-[0.5rem] bg-white px-2 py-1 text-brand-black border-1 ${cols.get(task.status)}`}>
-
+    <div
+      className={`rounded-[0.5rem] bg-white px-2 py-1 text-brand-black border-1 ${cols.get(task.status)}`}
+    >
       <p className="truncate text-xs font-medium select-none">
         <svg
           width="16"

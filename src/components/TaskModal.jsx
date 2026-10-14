@@ -3,7 +3,12 @@ import ModalDialog from './ModalDialog'
 import TaskFormFields from './TaskFormFields'
 
 // Compose the modal from the dialog and form hooks
-export default function TaskModal({ isOpen, onClose, onSubmit, taskToEdit = null }) {
+export default function TaskModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  taskToEdit = null,
+}) {
   const form = useTaskModalForm({ taskToEdit, onSubmit })
 
   return (

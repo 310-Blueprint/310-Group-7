@@ -26,7 +26,7 @@ function SignUpPage() {
 
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       setErrorMessage(
-        `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`,
+        `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`
       )
       return
     }

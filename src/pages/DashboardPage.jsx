@@ -33,11 +33,16 @@ import { celebrateCompletedTask } from '../lib/celebrationEffect'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
-const EMPTY_ITEMS = COLUMNS.reduce((acc, column) => ({ ...acc, [column.id]: [] }), {})
+const EMPTY_ITEMS = COLUMNS.reduce(
+  (acc, column) => ({ ...acc, [column.id]: [] }),
+  {}
+)
 
 function findContainer(items, id) {
   if (id in items) return id
-  return Object.keys(items).find((key) => items[key].some((item) => item.id === id))
+  return Object.keys(items).find((key) =>
+    items[key].some((item) => item.id === id)
+  )
 }
 
 // helper methods to apply filters to jobs on board
@@ -59,7 +64,7 @@ function filterItems(items, filters) {
 
   for (const column of COLUMNS) {
     const applications = items[column.id].filter((application) =>
-      matchesFilters(application, filters),
+      matchesFilters(application, filters)
     )
 
     if (filters.sortOrder) {
@@ -67,9 +72,7 @@ function filterItems(items, filters) {
         const dateA = new Date(a.dueDate).getTime()
         const dateB = new Date(b.dueDate).getTime()
 
-        return filters.sortOrder === 'asc'
-          ? dateA - dateB
-          : dateB - dateA
+        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA
       })
     }
 
@@ -118,19 +121,21 @@ function DashboardPage() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   const visibleItems = filterItems(items, filters)
   const reminders = useMemo(
     () => getUpcomingDeadlineReminders(Object.values(items).flat()),
-    [items],
+    [items]
   )
 
   function handleDragStart(event) {
     const container = findContainer(items, event.active.id)
     setDragStartContainer(container)
-    setActiveApplication(items[container]?.find((item) => item.id === event.active.id) ?? null)
+    setActiveApplication(
+      items[container]?.find((item) => item.id === event.active.id) ?? null
+    )
   }
 
   function handleDragOver(event) {
@@ -140,7 +145,8 @@ function DashboardPage() {
     const activeContainer = findContainer(items, active.id)
     const overContainer = findContainer(items, over.id)
 
-    if (!activeContainer || !overContainer || activeContainer === overContainer) return
+    if (!activeContainer || !overContainer || activeContainer === overContainer)
+      return
 
     setItems((prev) => {
       const activeItems = prev[activeContainer]
@@ -172,14 +178,22 @@ function DashboardPage() {
     const overContainer = findContainer(items, over.id)
     if (!activeContainer || !overContainer) return
 
-    const activeIndex = items[activeContainer].findIndex((item) => item.id === active.id)
-    const overIndex = items[overContainer].findIndex((item) => item.id === over.id)
+    const activeIndex = items[activeContainer].findIndex(
+      (item) => item.id === active.id
+    )
+    const overIndex = items[overContainer].findIndex(
+      (item) => item.id === over.id
+    )
 
     let nextItems = items
     if (activeContainer === overContainer && activeIndex !== overIndex) {
       nextItems = {
         ...items,
-        [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex),
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
       }
     }
 
@@ -189,20 +203,21 @@ function DashboardPage() {
         [overContainer]: nextItems[overContainer].map((application) =>
           application.id === active.id
             ? { ...application, status: overContainer }
-            : application,
+            : application
         ),
       }
     }
 
     if (nextItems !== items) setItems(nextItems)
 
-    updateApplicationPositions(overContainer, nextItems[overContainer]).catch((error) =>
-      console.error('Failed to save card position', error),
+    updateApplicationPositions(overContainer, nextItems[overContainer]).catch(
+      (error) => console.error('Failed to save card position', error)
     )
     if (startContainer && startContainer !== overContainer) {
-      updateApplicationPositions(startContainer, nextItems[startContainer]).catch((error) =>
-        console.error('Failed to save card position', error),
-      )
+      updateApplicationPositions(
+        startContainer,
+        nextItems[startContainer]
+      ).catch((error) => console.error('Failed to save card position', error))
 
       if (overContainer === OFFER_COLUMN) celebrateCompletedTask()
     }
@@ -234,7 +249,9 @@ function DashboardPage() {
       [column]: prev[column].filter((application) => application.id !== id),
     }))
 
-    deleteApplication(id).catch((error) => console.error('Failed to delete application', error))
+    deleteApplication(id).catch((error) =>
+      console.error('Failed to delete application', error)
+    )
   }
 
   return (
@@ -260,13 +277,9 @@ function DashboardPage() {
             aria-label="Open filters."
             onClick={() => setIsFilterOpen(true)}
             className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-brand-black sm:h-14 sm:w-14 transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
-            >
-              <img
-                src={filterIcon}
-                alt="Filter button."
-                className="size-6"
-              />
-            </button>
+          >
+            <img src={filterIcon} alt="Filter button." className="size-6" />
+          </button>
 
           {/*ADD APPLICATION BUTTON*/}
           <button
@@ -277,7 +290,6 @@ function DashboardPage() {
             + Add application
           </button>
         </div>
-
       </header>
 
       <img

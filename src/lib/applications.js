@@ -23,9 +23,11 @@ function toApplication(row) {
 
 function toRow(fields) {
   return Object.fromEntries(
-      Object.entries(fields)
-          .filter(([field, value]) => field in COLUMN_BY_FIELD && value !== undefined)
-          .map(([field, value]) => [COLUMN_BY_FIELD[field], value]),
+    Object.entries(fields)
+      .filter(
+        ([field, value]) => field in COLUMN_BY_FIELD && value !== undefined
+      )
+      .map(([field, value]) => [COLUMN_BY_FIELD[field], value])
   )
 }
 
@@ -42,10 +44,10 @@ export async function fetchApplications() {
 
 export async function insertApplication({ userId, ...fields }) {
   const { data, error } = await supabase
-      .from('applications')
-      .insert({ ...toRow(fields), user_id: userId })
-      .select()
-      .single()
+    .from('applications')
+    .insert({ ...toRow(fields), user_id: userId })
+    .select()
+    .single()
 
   if (error) throw error
   return toApplication(data)
@@ -59,8 +61,11 @@ export async function deleteApplication(id) {
 export async function updateApplicationPositions(status, applications) {
   const results = await Promise.all(
     applications.map((application, index) =>
-      supabase.from('applications').update({ status: status, position: index }).eq('id', application.id),
-    ),
+      supabase
+        .from('applications')
+        .update({ status: status, position: index })
+        .eq('id', application.id)
+    )
   )
 
   const failed = results.find((result) => result.error)

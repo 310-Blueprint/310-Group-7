@@ -4,7 +4,13 @@
 import { useId } from 'react'
 import useTaskDialog from './hooks/useTaskDialog'
 
-function ModalDialog({ isOpen, onClose, title, children, showCloseButton = false }) {
+function ModalDialog({
+  isOpen,
+  onClose,
+  title,
+  children,
+  showCloseButton = false,
+}) {
   const dialogRef = useTaskDialog(isOpen, onClose)
   const titleId = useId()
 
@@ -40,7 +46,12 @@ function ModalDialog({ isOpen, onClose, title, children, showCloseButton = false
               aria-label="Close dialog"
               className="absolute right-4 top-11 z-30 flex size-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-white sm:right-5 sm:top-14"
             >
-              <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="size-5"
+                aria-hidden="true"
+              >
                 <path
                   d="M18 6 6 18M6 6l12 12"
                   stroke="currentColor"

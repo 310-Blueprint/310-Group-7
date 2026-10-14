@@ -19,7 +19,7 @@ export async function fetchTasksByColumn(columns) {
     .order('position', { ascending: true })
     .order('created_at', { ascending: true })
 
-  if (error) { 
+  if (error) {
     throw error
   }
 
@@ -52,7 +52,7 @@ export async function insertTask({
     .select()
     .single()
 
-  if (error) { 
+  if (error) {
     throw error
   }
 
@@ -90,7 +90,7 @@ export async function updateTask(id, changes) {
     .select()
     .single()
 
-  if (error) { 
+  if (error) {
     throw error
   }
 
@@ -99,12 +99,9 @@ export async function updateTask(id, changes) {
 
 // Delete a task using its unique ID.
 export async function deleteTask(id) {
-  const { error } = await supabase
-    .from('tasks')
-    .delete()
-    .eq('id', id)
+  const { error } = await supabase.from('tasks').delete().eq('id', id)
 
-  if (error) { 
+  if (error) {
     throw error
   }
 }
@@ -119,23 +116,28 @@ export async function updateTaskPositions(status, tasks) {
           status,
           position: index,
         })
-        .eq('id', task.id),
-    ),
+        .eq('id', task.id)
+    )
   )
 
   const failed = results.find((result) => result.error)
 
-  if (failed) { 
+  if (failed) {
     throw failed.error
   }
 }
 // Persist both affected columns after dropping a task.
-export async function persistTaskMove({ sourceColumn, destinationColumn, updatedTasks }) {
-  const columns = sourceColumn === destinationColumn
-    ? [sourceColumn]
-    : [sourceColumn, destinationColumn]
+export async function persistTaskMove({
+  sourceColumn,
+  destinationColumn,
+  updatedTasks,
+}) {
+  const columns =
+    sourceColumn === destinationColumn
+      ? [sourceColumn]
+      : [sourceColumn, destinationColumn]
 
   await Promise.all(
-    columns.map((column) => updateTaskPositions(column, updatedTasks[column])),
+    columns.map((column) => updateTaskPositions(column, updatedTasks[column]))
   )
 }

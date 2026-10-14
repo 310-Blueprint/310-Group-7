@@ -30,8 +30,10 @@ function detectTaskCollision(args) {
 
   const task = collisions.find(({ id }) => {
     const container = args.droppableContainers.find((item) => item.id === id)
-    return container?.data.current?.type === 'task' &&
+    return (
+      container?.data.current?.type === 'task' &&
       container.data.current.status === column.id
+    )
   })
 
   return [task ?? column]
@@ -45,9 +47,10 @@ function withPositions(taskList) {
 function reorderInColumn(tasks, column, activeId, overId) {
   const cards = tasks[column]
   const from = cards.findIndex((task) => task.id === activeId)
-  const to = overId === column
-    ? cards.length - 1
-    : cards.findIndex((task) => task.id === overId)
+  const to =
+    overId === column
+      ? cards.length - 1
+      : cards.findIndex((task) => task.id === overId)
 
   if (from === -1 || to === -1 || from === to) return null
 
@@ -65,11 +68,14 @@ function getInsertionIndex(cards, event, column) {
   if (index === -1) return cards.length
 
   // Dropping below the final card's midpoint appends instead of inserting above.
-  const pointerY = typeof activatorEvent?.clientY === 'number'
-    ? activatorEvent.clientY + delta.y
-    : null
-  const belowLastCard = index === cards.length - 1 &&
-    pointerY !== null && pointerY > over.rect.top + over.rect.height / 2
+  const pointerY =
+    typeof activatorEvent?.clientY === 'number'
+      ? activatorEvent.clientY + delta.y
+      : null
+  const belowLastCard =
+    index === cards.length - 1 &&
+    pointerY !== null &&
+    pointerY > over.rect.top + over.rect.height / 2
 
   return belowLastCard ? cards.length : index
 }
@@ -100,9 +106,10 @@ export function getTaskDragMove(tasks, event) {
   const destinationColumn = findTaskColumn(tasks, over.id)
   if (!sourceColumn || !isTaskStatus(destinationColumn)) return null
 
-  const updatedTasks = sourceColumn === destinationColumn
-    ? reorderInColumn(tasks, sourceColumn, active.id, over.id)
-    : moveBetweenColumns(tasks, event, sourceColumn, destinationColumn)
+  const updatedTasks =
+    sourceColumn === destinationColumn
+      ? reorderInColumn(tasks, sourceColumn, active.id, over.id)
+      : moveBetweenColumns(tasks, event, sourceColumn, destinationColumn)
 
   return updatedTasks ? { sourceColumn, destinationColumn, updatedTasks } : null
 }
@@ -113,7 +120,7 @@ export default function useTaskDragAndDrop({ tasks, setTasks, setSaveError }) {
   const isSaving = useRef(false)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   function handleDragStart({ active }) {
@@ -136,7 +143,10 @@ export default function useTaskDragAndDrop({ tasks, setTasks, setSaveError }) {
 
     try {
       await persistTaskMove(move)
-      if (move.sourceColumn !== 'completed' && move.destinationColumn === 'completed') {
+      if (
+        move.sourceColumn !== 'completed' &&
+        move.destinationColumn === 'completed'
+      ) {
         celebrateCompletedTask()
       }
     } catch (error) {

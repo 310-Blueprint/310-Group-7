@@ -25,7 +25,10 @@ function LoginPage() {
     setErrorMessage('')
     setIsSubmitting(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
     setIsSubmitting(false)
 

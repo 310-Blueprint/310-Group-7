@@ -43,10 +43,9 @@ export default function useTaskModalForm({ taskToEdit, onSubmit }) {
 
     const newErrors = validateTask(values)
     setErrors(newErrors)
-    if (Object.keys(newErrors).length > 0) 
-      {
-        return
-      }
+    if (Object.keys(newErrors).length > 0) {
+      return
+    }
 
     setIsSubmitting(true)
     setSubmitError(null)

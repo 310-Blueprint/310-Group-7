@@ -1,13 +1,13 @@
-@import "tailwindcss";
-@import "./styles/preset.css";
+@import 'tailwindcss';
+@import './styles/preset.css';
 
 @layer base {
-    html {
-      min-width: 320px;
-    }
-
-    body {
-      background-color: var(--color-brand-bg);
-      min-width: 320px;
-    }
+  html {
+    min-width: 320px;
   }
+
+  body {
+    background-color: var(--color-brand-bg);
+    min-width: 320px;
+  }
+}
