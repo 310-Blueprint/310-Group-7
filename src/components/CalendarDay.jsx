@@ -1,8 +1,8 @@
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import CalendarEntry from './CalendarEntry'
+import CalendarTaskEntry from './CalendarTaskEntry'
 
-function CalendarDay({ id, title, events, isCurrent}) {
+function CalendarDay({ id, title, events, tasks, isCurrent}) {
   const { setNodeRef } = useDroppable({ id })
   const sectStyle = {
     border: '1px solid #d6d6d6'
@@ -19,16 +19,20 @@ function CalendarDay({ id, title, events, isCurrent}) {
         </h2>
       </header>
 
-      <SortableContext items={events.map((application) => application.id)} strategy={verticalListSortingStrategy}>
-        <div ref={setNodeRef} className="min-h-full flex-1 space-y-3 overflow-y-auto">
-          {events.map((application) => (
-            <CalendarEntry
-              key={application.id}
-              application={application}
-            />
-          ))}
-        </div>
-      </SortableContext>
+      <div ref={setNodeRef} className="min-h-full flex-1 space-y-3 overflow-y-auto">
+        {events.map((application) => (
+          <CalendarEntry
+            key={application.id}
+            application={application}
+          />
+        ))}
+        {tasks.map((task) => (
+          <CalendarTaskEntry
+            key={task.id}
+            task={task}
+          />
+        ))}
+      </div>
     </section>
   )
 }

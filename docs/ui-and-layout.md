@@ -170,6 +170,15 @@ narrow screens.
 - The drop zone has a practical minimum height and responsive icon and text
   sizes.
 
+### Calendar Page
+
+`CalendarPage.jsx` has no fixed minimum width and no fixed viewport height, so
+the page grows and scrolls when its content is taller than the viewport.
+
+- The calendar grids grow/shrink based on how many items are in it.
+- If a row grows due to its item count, the other rows will shrink in response.
+- Same beaver display as the other pages.
+
 ### Authentication pages
 
 The shared auth components support narrow screens without changing the form
