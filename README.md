@@ -112,6 +112,13 @@ what already works.
 | `npm run build` | Build for production into `dist` |
 | `npm run lint` | Run ESLint across the project |
 | `npm run preview` | Serve the production build locally |
+| `npm run prettier` | Run Prettier's .check, does not modify any files |
+| `npm run codestyle` | Run lint & prettier together |
+
+### Pre-commit
+
+There is a pre-commit hook setup with `husky` and `lint-staged` that will run 
+`Prettier` on every staged file. 
 
 ### Testing
 
