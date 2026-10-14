@@ -58,9 +58,7 @@ session is being restored.
 
 ## Favicon and branding
 
-`index.html` points at `/favicon.png`, served from `public/favicon.png`. The
-older `public/favicon.svg` is no longer referenced and should be removed; see
-[ROADMAP.md](ROADMAP.md).
+`index.html` points at `/favicon.png`, served from `public/favicon.png`.
 
 ## The layering
 
