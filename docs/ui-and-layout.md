@@ -38,8 +38,20 @@ mark is `aria-hidden` with an empty `alt`, because the word beside it already
 carries the name. It is shared by the sidebar, the auth card, and the
 route-loading screen, so changing it changes all three.
 
-**`Sidebar`** is the app navigation for the dashboard and documents pages, and
-carries the sign-out control.
+**`Sidebar`** is the app navigation for the dashboard, documents, and Task
+List pages, and carries the sign-out control.
+
+**`PageShell`** provides the authenticated pages' shared background, sidebar,
+and content frame. The Dashboard, Documents, and Task List pages supply their
+own headers, board or panel content, and decorative images as children.
+
+**`TaskColumn`** renders a Task List column with a heading and task count. The
+three main columns contain sortable cards; Due Soon displays the same card
+style in read-only form without edit or delete controls.
+
+**`TaskCard`** displays a task's title, optional description, due date, and
+optional edit/delete buttons. `SortableTaskCard` adds drag behaviour around it
+without putting drag logic inside the visual card component.
 
 **`RouteLoading`** is the placeholder shown by both route guards while the
 session is being restored.
@@ -69,7 +81,7 @@ Two things this depends on:
 
 The two beaver images share `BEAVER_POSITION` so they cannot drift apart. They
 are one piece of artwork split in half, and any difference in position shows up
-as a visible seam. The dashboard and documents pages use the same constant for
+as a visible seam. The dashboard, documents, and Task List pages use the same constant for
 the same reason.
 
 Nothing in the chain may have `overflow-hidden`, or the grass and beaver get
@@ -99,10 +111,10 @@ column count change at different widths.
 
 | Breakpoint | From | Behaviour |
 | --- | --- | --- |
-| base | 320px | Top navigation bar with icons only, stacked headers and actions, one dashboard column |
-| `sm` | 640px | Navigation labels appear, wider controls and typography, two dashboard columns |
+| base | 320px | Top navigation bar with icons only, stacked headers and actions, one board column |
+| `sm` | 640px | Navigation labels appear, wider controls and typography, two board columns |
 | `md` | 768px | Navigation becomes the vertical left sidebar |
-| `xl` | 1280px | Four dashboard columns, decorative artwork shown |
+| `xl` | 1280px | Four board columns, decorative artwork shown |
 
 ### Navigation
 
@@ -123,6 +135,27 @@ the page grows and scrolls when its content is taller than the viewport.
   visible as drop targets.
 - The split beaver and grass artwork is hidden below `xl` to prevent it
   overlapping content.
+
+### Task List
+
+`TaskListPage.jsx` reuses `PageShell` and the Dashboard's responsive board
+layout. At base width, cards appear in one column; at `sm` they appear in two,
+and at `xl` all four visual columns appear side by side.
+
+- The page heading and `+ Add task` button stack on mobile, with the button
+  taking the available width. Loading and save errors appear below the heading.
+- `TaskColumn.jsx` gives each column a coloured background, rounded corners,
+  a task count, and minimum height so empty columns remain visible.
+- To Do, In Progress, and Completed use `bg-brand-blue`, `bg-brand-pink`, and
+  `bg-brand-green`. The read-only Due Soon column uses `bg-brand-yellow`.
+- `TaskCard.jsx` keeps long task titles and descriptions wrapped. Edit and
+  delete buttons have accessible labels and their own keyboard focus styles;
+  using them does not start a card drag.
+- The same split beaver and grass artwork used by the Dashboard is hidden
+  below `xl` to avoid covering board content.
+
+For task data, status changes, ordering, and completion confetti, see
+[task-list.md](task-list.md).
 
 ### Documents page
 
@@ -164,6 +197,21 @@ once.
 The modal heading sits above and slightly overlapping the dark card to match the
 original mockup, achieved with a negative margin on the card plus explicit
 z-index stacking so the heading renders above rather than behind it.
+
+### Task modal
+
+`TaskModal.jsx` reuses the native `<dialog>` styling for both adding and editing
+tasks. Its heading changes between "ADD TASK" and "EDIT TASK", above a dark card.
+
+- The dialog scrolls vertically if the form is taller than the viewport.
+- Padding, typography, and form gaps adapt to narrower screens. The submit
+  button fills the available width on mobile.
+- Inputs have visible focus styles; validation errors appear by the relevant
+  fields, with an inline message for a failed database save.
+- The submit button shows a saving state and is disabled while a request is in
+  flight, preventing duplicate submissions.
+- The status dropdown contains only the three stored task statuses. Due Soon
+  is not an option because it is calculated from due dates.
 
 ## Conventions
 
