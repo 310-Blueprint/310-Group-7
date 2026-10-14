@@ -177,6 +177,8 @@ the page grows and scrolls when its content is taller than the viewport.
 
 - The calendar grids grow/shrink based on how many items are in it.
 - If a row grows due to its item count, the other rows will shrink in response.
+- Previous and next month controls use the shared dark, rounded button style,
+  with visible direction icons and keyboard focus states.
 - Same beaver display as the other pages.
 
 ### Authentication pages
