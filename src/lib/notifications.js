@@ -29,7 +29,11 @@ function parseDueDate(value) {
 }
 
 export function getUpcomingDeadlineReminders(applications, today = new Date()) {
-  const todayNumber = toDayNumber(today.getFullYear(), today.getMonth(), today.getDate())
+  const todayNumber = toDayNumber(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  )
 
   return applications
     .filter((application) => !FINISHED_STATUSES.has(application.status))
@@ -46,12 +50,12 @@ export function getUpcomingDeadlineReminders(applications, today = new Date()) {
       (application) =>
         application !== null &&
         application.daysUntilDue >= 0 &&
-        application.daysUntilDue <= UPCOMING_WINDOW_DAYS,
+        application.daysUntilDue <= UPCOMING_WINDOW_DAYS
     )
     .sort(
       (first, second) =>
         first.daysUntilDue - second.daysUntilDue ||
-        first.company.localeCompare(second.company),
+        first.company.localeCompare(second.company)
     )
 }
 

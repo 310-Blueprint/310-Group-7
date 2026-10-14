@@ -2,10 +2,10 @@ import { useDroppable } from '@dnd-kit/core'
 import CalendarEntry from './CalendarEntry'
 import CalendarTaskEntry from './CalendarTaskEntry'
 
-function CalendarDay({ id, title, events, tasks, isCurrent}) {
+function CalendarDay({ id, title, events, tasks, isCurrent }) {
   const { setNodeRef } = useDroppable({ id })
   const sectStyle = {
-    border: '1px solid #d6d6d6'
+    border: '1px solid #d6d6d6',
   }
 
   return (
@@ -19,18 +19,15 @@ function CalendarDay({ id, title, events, tasks, isCurrent}) {
         </h2>
       </header>
 
-      <div ref={setNodeRef} className="min-h-full flex-1 space-y-3 overflow-y-auto">
+      <div
+        ref={setNodeRef}
+        className="min-h-full flex-1 space-y-3 overflow-y-auto"
+      >
         {events.map((application) => (
-          <CalendarEntry
-            key={application.id}
-            application={application}
-          />
+          <CalendarEntry key={application.id} application={application} />
         ))}
         {tasks.map((task) => (
-          <CalendarTaskEntry
-            key={task.id}
-            task={task}
-          />
+          <CalendarTaskEntry key={task.id} task={task} />
         ))}
       </div>
     </section>

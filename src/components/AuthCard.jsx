@@ -16,13 +16,17 @@ import beaverArms from '../assets/beaverArms.png'
 // The two beaver layers are the same artwork split in half, so they have to
 // sit at exactly the same spot — only their z-index differs. Sharing one
 // position means they cannot drift apart.
-const BEAVER_POSITION = 'pointer-events-none absolute -top-5 right-1 w-20 sm:-top-6 sm:right-4 sm:w-30'
+const BEAVER_POSITION =
+  'pointer-events-none absolute -top-5 right-1 w-20 sm:-top-6 sm:right-4 sm:w-30'
 
 function AuthCard({ title, children }) {
   return (
     <main className="relative grid min-h-screen place-items-center overflow-hidden bg-brand-black px-3 py-20 text-brand-bg sm:px-4 sm:py-16">
       <div className="absolute left-5 top-5 sm:left-6 sm:top-6">
-        <Logo className="text-base sm:text-lg" markClassName="size-5 sm:size-6" />
+        <Logo
+          className="text-base sm:text-lg"
+          markClassName="size-5 sm:size-6"
+        />
       </div>
 
       <div className="relative w-full max-w-xl">

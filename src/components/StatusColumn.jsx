@@ -21,8 +21,14 @@ function StatusColumn({ id, title, tone, applications, onDeleteApplication }) {
         </span>
       </header>
 
-      <SortableContext items={applications.map((application) => application.id)} strategy={verticalListSortingStrategy}>
-        <div ref={setNodeRef} className="min-h-full flex-1 space-y-3 overflow-y-auto">
+      <SortableContext
+        items={applications.map((application) => application.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div
+          ref={setNodeRef}
+          className="min-h-full flex-1 space-y-3 overflow-y-auto"
+        >
           {applications.map((application) => (
             <SortableApplicationCard
               key={application.id}

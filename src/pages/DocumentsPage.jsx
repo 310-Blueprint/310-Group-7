@@ -3,7 +3,10 @@ import beaver from '../assets/beaver.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import FormMessage from '../components/FormMessage'
-import PageShell, { BEAVER_POSITION, PRIMARY_PILL_CLASSES } from '../components/PageShell'
+import PageShell, {
+  BEAVER_POSITION,
+  PRIMARY_PILL_CLASSES,
+} from '../components/PageShell'
 import useAuth from '../context/useAuth'
 import { supabase } from '../lib/supabaseClient'
 
@@ -52,7 +55,9 @@ function DocumentsPage() {
       }
 
       // Supabase drops this marker into a folder that would otherwise be empty.
-      const files = data.filter((file) => file.name !== '.emptyFolderPlaceholder')
+      const files = data.filter(
+        (file) => file.name !== '.emptyFolderPlaceholder'
+      )
 
       if (files.length === 0) {
         setDocuments([])
@@ -82,7 +87,9 @@ function DocumentsPage() {
       // Keyed by path, not zipped by index — the response order isn't
       // guaranteed to match the request, and zipping would pair names with the
       // wrong URLs without ever erroring.
-      const urlByPath = new Map(signed.map((item) => [item.path, item.signedUrl]))
+      const urlByPath = new Map(
+        signed.map((item) => [item.path, item.signedUrl])
+      )
 
       // id is the full storage path, which is what remove() needs and what
       // keeps it unique across users.
@@ -91,7 +98,7 @@ function DocumentsPage() {
           id: `${user.id}/${file.name}`,
           name: toDisplayName(file.name),
           url: urlByPath.get(`${user.id}/${file.name}`) ?? '',
-        })),
+        }))
       )
       setIsLoading(false)
     }

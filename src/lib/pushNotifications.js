@@ -30,7 +30,9 @@ export async function enablePushNotifications(userId) {
   const publicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
   if (!publicKey) return { status: 'local-only' }
 
-  const registration = await navigator.serviceWorker.register('/notification-service-worker.js')
+  const registration = await navigator.serviceWorker.register(
+    '/notification-service-worker.js'
+  )
   let subscription = await registration.pushManager.getSubscription()
 
   if (!subscription) {

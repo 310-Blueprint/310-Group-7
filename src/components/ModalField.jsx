@@ -62,7 +62,8 @@ function ModalField({
   return (
     <label htmlFor={id} className="flex flex-col gap-2">
       <span className="font-medium text-brand-bg">
-        {label}{required && ' *'}
+        {label}
+        {required && ' *'}
       </span>
       {field}
       {error && <span className="px-2 text-sm text-red-300">{error}</span>}

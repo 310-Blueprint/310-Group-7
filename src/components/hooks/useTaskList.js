@@ -43,7 +43,9 @@ export default function useTaskList() {
         if (!cancelled) setIsLoading(false)
       })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   function openAddModal() {
@@ -67,10 +69,11 @@ export default function useTaskList() {
 
   async function addTask(task) {
     const status = isTaskStatus(task.status) ? task.status : 'todo'
-    const position = Math.max(
-      -1,
-      ...tasks[status].map((item, index) => item.position ?? index),
-    ) + 1
+    const position =
+      Math.max(
+        -1,
+        ...tasks[status].map((item, index) => item.position ?? index)
+      ) + 1
 
     const saved = await insertTask({ ...task, status, position })
     setTasks((prev) => ({
@@ -82,7 +85,9 @@ export default function useTaskList() {
 
   async function editTask(updatedTask) {
     const sourceColumn = findTaskColumn(tasks, updatedTask.id)
-    const exists = tasks[sourceColumn]?.some((task) => task.id === updatedTask.id)
+    const exists = tasks[sourceColumn]?.some(
+      (task) => task.id === updatedTask.id
+    )
     if (!exists) throw new Error('Task not found')
 
     const destinationColumn = isTaskStatus(updatedTask.status)
@@ -98,10 +103,13 @@ export default function useTaskList() {
 
     // Preserve the existing order unless the edit changes the task status.
     if (sourceColumn !== destinationColumn) {
-      changes.position = Math.max(
-        -1,
-        ...tasks[destinationColumn].map((task, index) => task.position ?? index),
-      ) + 1
+      changes.position =
+        Math.max(
+          -1,
+          ...tasks[destinationColumn].map(
+            (task, index) => task.position ?? index
+          )
+        ) + 1
     }
 
     const saved = await updateTask(updatedTask.id, changes)
@@ -161,7 +169,7 @@ function replaceSavedTask(tasks, saved) {
     return {
       ...tasks,
       [sourceColumn]: tasks[sourceColumn].map((task) =>
-        task.id === saved.id ? saved : task,
+        task.id === saved.id ? saved : task
       ),
     }
   }

@@ -10,7 +10,7 @@ export async function savePushSubscription(userId, subscription) {
       auth: savedSubscription.keys?.auth,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: 'endpoint' },
+    { onConflict: 'endpoint' }
   )
 
   if (error) throw error

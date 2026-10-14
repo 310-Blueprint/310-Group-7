@@ -57,7 +57,12 @@ function TaskListContent() {
         </button>
       </header>
 
-      <img src={beaver} alt="" aria-hidden="true" className={`${BEAVER_POSITION} z-0`} />
+      <img
+        src={beaver}
+        alt=""
+        aria-hidden="true"
+        className={`${BEAVER_POSITION} z-0`}
+      />
 
       <TaskBoard
         tasks={taskList.tasks}
@@ -69,7 +74,12 @@ function TaskListContent() {
         onTaskCompleted={celebrateCompletedTask}
       />
 
-      <img src={beaverArms} alt="" aria-hidden="true" className={`${BEAVER_POSITION} z-20`} />
+      <img
+        src={beaverArms}
+        alt=""
+        aria-hidden="true"
+        className={`${BEAVER_POSITION} z-20`}
+      />
       <img
         src={grassDouble}
         alt=""
