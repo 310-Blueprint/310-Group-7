@@ -7,7 +7,7 @@ const STAGE_RANK = {
 }
 
 // Funnel on page, counts applications that have *reached* each stage, 
-// not the number of applications currently in that stage.
+// NOT the number of applications currently in that stage.
 export const FUNNEL_STAGES = [
   { id: 'applied', title: 'Sent' },
   { id: 'interview', title: 'Interview' },
