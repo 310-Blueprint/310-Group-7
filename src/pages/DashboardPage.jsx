@@ -27,6 +27,8 @@ import {
 import { getUpcomingDeadlineReminders } from '../lib/notifications'
 import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
+import filterIcon from '../assets/filter-svgrepo-com.svg'
+import FilterModal from '../components/FilterModal'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
@@ -39,6 +41,45 @@ const EMPTY_ITEMS = COLUMNS.reduce((acc, column) => ({ ...acc, [column.id]: [] }
 function findContainer(items, id) {
   if (id in items) return id
   return Object.keys(items).find((key) => items[key].some((item) => item.id === id))
+}
+
+// helper methods to apply filters to jobs on board
+function matchesText(value, filter) {
+  const searchText = filter.trim().toLowerCase()
+  return !searchText || (value ?? '').toLowerCase().includes(searchText)
+}
+
+function matchesFilters(application, filters) {
+  return (
+    matchesText(application.company, filters.company) &&
+    matchesText(application.location, filters.location) &&
+    matchesText(application.role, filters.role)
+  )
+}
+
+function filterItems(items, filters) {
+  const visibleItems = {}
+
+  for (const column of COLUMNS) {
+    const applications = items[column.id].filter((application) =>
+      matchesFilters(application, filters),
+    )
+
+    if (filters.sortOrder) {
+      applications.sort((a, b) => {
+        const dateA = new Date(a.dueDate).getTime()
+        const dateB = new Date(b.dueDate).getTime()
+
+        return filters.sortOrder === 'asc'
+          ? dateA - dateB
+          : dateB - dateA
+      })
+    }
+
+    visibleItems[column.id] = applications
+  }
+
+  return visibleItems
 }
 
 function celebrateOffer() {
@@ -62,6 +103,14 @@ function DashboardPage() {
   const [activeApplication, setActiveApplication] = useState(null)
   const [dragStartContainer, setDragStartContainer] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  // Stored filter values/states
+  const [filters, setFilters] = useState({
+    company: '',
+    location: '',
+    role: '',
+    sortOrder: '',
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -88,6 +137,7 @@ function DashboardPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
+  const visibleItems = filterItems(items, filters)
   const reminders = useMemo(
     () => getUpcomingDeadlineReminders(Object.values(items).flat()),
     [items],
@@ -216,13 +266,32 @@ function DashboardPage() {
             <p className="mt-1 text-xs text-red-600">Couldn't load applications. Try refreshing.</p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
-        >
-          + Add application
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/*FILTER BUTTON*/}
+          <button
+            type="button"
+            aria-label="Open filters."
+            onClick={() => setIsFilterOpen(true)}
+            className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-brand-black sm:h-14 sm:w-14 transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black"
+            >
+              <img
+                src={filterIcon}
+                alt="Filter button."
+                className="size-6"
+              />
+            </button>
+
+          {/*ADD APPLICATION BUTTON*/}
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className={`w-full transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black sm:w-auto ${PRIMARY_PILL_CLASSES}`}
+          >
+            + Add application
+          </button>
+        </div>
+
       </header>
 
       <img
@@ -253,7 +322,7 @@ function DashboardPage() {
               id={column.id}
               title={column.title}
               tone={column.tone}
-              applications={items[column.id]}
+              applications={visibleItems[column.id]}
               onDeleteApplication={handleDeleteApplication}
             />
           ))}
@@ -286,6 +355,15 @@ function DashboardPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddApplication}
+      />
+
+      <FilterModal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onSubmit={(nextFilters) => {
+          setFilters(nextFilters)
+          setIsFilterOpen(false)
+        }}
       />
     </PageShell>
   )
