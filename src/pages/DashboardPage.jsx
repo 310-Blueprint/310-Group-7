@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -15,6 +15,7 @@ import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
 import ApplicationCard from '../components/ApplicationCard'
 import ApplicationModal from '../components/ApplicationModal'
+import NotificationPanel from '../components/NotificationPanel'
 import PageShell, { BEAVER_POSITION, PRIMARY_PILL_CLASSES } from '../components/PageShell'
 import StatusColumn from '../components/StatusColumn'
 import {
@@ -23,6 +24,7 @@ import {
   insertApplication,
   updateApplicationPositions,
 } from '../lib/applications'
+import { getUpcomingDeadlineReminders } from '../lib/notifications'
 import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
 
@@ -86,6 +88,11 @@ function DashboardPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
+  const reminders = useMemo(
+    () => getUpcomingDeadlineReminders(Object.values(items).flat()),
+    [items],
+  )
+
   function handleDragStart(event) {
     const container = findContainer(items, event.active.id)
     setDragStartContainer(container)
@@ -140,8 +147,20 @@ function DashboardPage() {
         ...items,
         [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex),
       }
-      setItems(nextItems)
     }
+
+    if (startContainer && startContainer !== overContainer) {
+      nextItems = {
+        ...nextItems,
+        [overContainer]: nextItems[overContainer].map((application) =>
+          application.id === active.id
+            ? { ...application, status: overContainer }
+            : application,
+        ),
+      }
+    }
+
+    if (nextItems !== items) setItems(nextItems)
 
     updateApplicationPositions(overContainer, nextItems[overContainer]).catch((error) =>
       console.error('Failed to save card position', error),
@@ -211,6 +230,13 @@ function DashboardPage() {
         alt=""
         aria-hidden="true"
         className={`${BEAVER_POSITION} z-0`}
+      />
+
+      <NotificationPanel
+        key={user?.id}
+        reminders={reminders}
+        userId={user?.id}
+        className="mb-4"
       />
 
       <DndContext
