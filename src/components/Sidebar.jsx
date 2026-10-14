@@ -31,6 +31,21 @@ const NAV_ITEMS = [
     ),
   },
   {
+  label: 'Task List',
+  to: '/tasks',
+  icon: (
+    <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+      <path
+        d="M3 6l2 2 3-4M3 12l2 2 3-4M3 18l2 2 3-4M12 6h9M12 12h9M12 18h9"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+},
+  {
     label: 'Calendar',
     to: '/calendar',
     icon: (
