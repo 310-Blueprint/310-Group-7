@@ -82,8 +82,6 @@ render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 
 ## Housekeeping
 
-- Remove `@dnd-kit/dom` from `package.json`. It is declared but imported
-  nowhere.
 - Remove `public/favicon.svg`. `index.html` points at `favicon.png` instead.
 - Remove `src/assets/leaf1.png`, `leaf2.png`, and `logo.png`, which are imported
   nowhere and are around 500 KB of dead weight in the repository.
