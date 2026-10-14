@@ -10,9 +10,19 @@ const EMPTY_ITEMS = new Map()
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
 const MONTH_BUTTON_CLASSES =
   'inline-flex items-center gap-2 rounded-full bg-brand-black px-4 py-2 text-sm font-semibold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-black'
 
@@ -148,7 +158,11 @@ function CalendarPage() {
                 strokeWidth="1.8"
                 aria-hidden="true"
               >
-                <path d="M10 3 5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M10 3 5 8l5 5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Previous
             </button>
@@ -168,7 +182,11 @@ function CalendarPage() {
                 strokeWidth="1.8"
                 aria-hidden="true"
               >
-                <path d="m6 3 5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="m6 3 5 5-5 5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </nav>
