@@ -17,6 +17,9 @@ However, these aren't that detrimental to our use case, except when the user wan
 This page uses the same database queries as `/dashboard` to retrieve applications. Refer to [dashboard.md] for more details.
 However, instead of sorting them by status, we sort them by their due date, which will be used to place applications into their specific dates.
 
+This page uses the hook `useTaskList` to retrieve tasks. Refer to [tasklist.md] for more details.
+This is sorted the same way using `.dueDate`.
+
 ## Verification
 
 There are no automated tests. Verify by hand:
@@ -24,11 +27,18 @@ There are no automated tests. Verify by hand:
 - `npm run lint` and `npm run build` pass.
 - Ensure that all applications in the dashboard show up on the calendar.
 - Make & delete some applications and see if those changes are reflected in the calendar.
+- Repeat with tasks.
+
+## Components
+
+### CalendarEntry & CalendarTaskEntry
+These two components included in `/components` display an entry in the calendar. The regular entry is used for applications whereas the task entries are used for tasks.
+These contain an SVG icon + a paragraph containing their current status alongside the entry's title.
+The colours are decided by their current status, this can be edited by editing the maps inside of the `.jsx` files.
 
 ## Future work
 
 - Better visuals
 - Toggle to a "week" view
-- Include support for tasks
 
 See [ROADMAP.md](ROADMAP.md) for the full list.

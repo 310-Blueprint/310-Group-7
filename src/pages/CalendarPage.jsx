@@ -6,6 +6,7 @@ import {
   fetchApplications,
 } from '../lib/applications'
 import CalendarDay from '../components/CalendarDay'
+import useTaskList from '../components/hooks/useTaskList'
 
 const EMPTY_ITEMS = new Map()
 
@@ -17,10 +18,12 @@ const MONTHS = [
 
 function groupByDate(applications) {
   return new Map(
-    applications.map((application) => [
-      new Date(application.dueDate),
-      application,
-    ]),
+    applications
+      .filter((application) => application.dueDate != null) // Due dates can be null, filter those apps/tasks out
+      .map((application) => [
+        new Date(application.dueDate),
+        application,
+      ]),
   )
 }
 
@@ -41,8 +44,15 @@ function getApplicationForDate(applicationsByDate, year, month, day) {
 
 function CalendarPage() {
   const [items, setItems] = useState(EMPTY_ITEMS)
+  const taskList = useTaskList();
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
+
+  const tasks = groupByDate(
+    Object.entries(taskList.tasks)
+      .filter(([key]) => key !== 'completed')
+      .flatMap(([, taskItems]) => taskItems),
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -146,6 +156,7 @@ function CalendarPage() {
             id={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
             title={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
             events={getApplicationForDate(items, prevYear, prevMonth, (daysInPrevMonth - (firstDayIndex - index) + 1))}
+            tasks={[]}
           />
         ))}
 
@@ -154,6 +165,7 @@ function CalendarPage() {
             id={getDayIndex(index, daysInMonth).toString()}
             title={getDayIndex(index, daysInMonth).toString()}
             events={getApplicationForDate(items, year, month, index + 1)}
+            tasks={getApplicationForDate(tasks, year, month, index + 1)}
             isCurrent={
               today.getFullYear() === year &&
               today.getMonth() === month &&
@@ -167,6 +179,7 @@ function CalendarPage() {
             id={(index + 1).toString()}
             title={(index + 1).toString()}
             events={getApplicationForDate(items, nextYear, nextMonth, index + 1)}
+            tasks={[]}
           />
         ))}
       </div>
