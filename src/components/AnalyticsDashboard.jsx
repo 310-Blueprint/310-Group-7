@@ -1,3 +1,5 @@
+import ConversionFunnel from './ConversionFunnel'
+import StageBreakdownChart from './StageBreakdownChart'
 import StatCard from './StatCard'
 import { formatPercentage } from '../lib/analytics'
 
@@ -7,7 +9,7 @@ function describeConversion(reached, from, emptyHint) {
 }
 
 function AnalyticsDashboard({ summary }) {
-  const { total, sent, funnel, conversions } = summary
+  const { total, sent, stages, funnel, conversions } = summary
   const [, interviewed, offered] = funnel.map((stage) => stage.count)
 
   return (
@@ -37,6 +39,11 @@ function AnalyticsDashboard({ summary }) {
           caption={describeConversion(offered, interviewed, 'Reach an interview to see this')}
           tone="bg-brand-yellow"
         />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <StageBreakdownChart stages={stages} />
+        <ConversionFunnel funnel={funnel} />
       </div>
     </div>
   )
