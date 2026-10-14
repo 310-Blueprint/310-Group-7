@@ -82,10 +82,7 @@ render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
 
 ## Housekeeping
 
-- Add Prettier and an `.editorconfig`. Formatting is inconsistent across the
-  codebase: most files use two-space indentation and no semicolons, while
-  `src/components/ApplicationModal.jsx` uses four spaces, semicolons, and double
-  quotes.
+- Nothing so far!
 
 ## Planned for A2
 
