@@ -15,7 +15,7 @@ import {
   findTaskColumn,
   isTaskStatus,
 } from '../../lib/taskBoard'
-import { celebrateCompletedTask } from '../../lib/taskCelebration'
+import { celebrateCompletedTask } from '../../lib/celebrationEffect'
 
 // Prefer the column beneath the pointer, then a task inside that column.
 // In particular, the empty space in In Progress must remain droppable.

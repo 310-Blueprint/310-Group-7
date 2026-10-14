@@ -9,7 +9,6 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
-import confetti from 'canvas-confetti'
 import beaver from '../assets/beaver.png'
 import beaverArms from '../assets/beaverArms.png'
 import grassDouble from '../assets/grassDouble.svg'
@@ -30,13 +29,10 @@ import useAuth from '../context/useAuth'
 import { COLUMNS, groupByStatus } from './dashboardData'
 import filterIcon from '../assets/filter-svgrepo-com.svg'
 import FilterModal from '../components/FilterModal'
+import { celebrateCompletedTask } from '../lib/celebrationEffect'
 
 const NEW_APPLICATION_COLUMN = COLUMNS[0].id
 const OFFER_COLUMN = 'offer'
-// Mirrors brand-yellow/blue/pink/green in src/styles/preset.css — canvas-confetti
-// needs literal color strings, so these can't reference the CSS custom
-// properties directly. Keep in sync if the palette changes.
-const CONFETTI_COLORS = ['#F5E0AE', '#A6C2D2', '#D9BFB1', '#B8D2C7']
 const EMPTY_ITEMS = COLUMNS.reduce((acc, column) => ({ ...acc, [column.id]: [] }), {})
 
 function findContainer(items, id) {
@@ -81,19 +77,6 @@ function filterItems(items, filters) {
   }
 
   return visibleItems
-}
-
-function celebrateOffer() {
-  const fire = (options) =>
-    confetti({
-      origin: { y: 0.65 },
-      colors: CONFETTI_COLORS,
-      disableForReducedMotion: true,
-      ...options,
-    })
-
-  fire({ particleCount: 60, spread: 55, angle: 60, origin: { x: 0.75, y: 0.65 } })
-  fire({ particleCount: 60, spread: 55, angle: 120, origin: { x: 0.75, y: 0.65 } })
 }
 
 function DashboardPage() {
@@ -221,7 +204,7 @@ function DashboardPage() {
         console.error('Failed to save card position', error),
       )
 
-      if (overContainer === OFFER_COLUMN) celebrateOffer()
+      if (overContainer === OFFER_COLUMN) celebrateCompletedTask()
     }
   }
 

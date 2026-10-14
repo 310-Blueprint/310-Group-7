@@ -8,7 +8,7 @@ import PageShell, {
 } from '../components/PageShell'
 import TaskBoard from '../components/TaskBoard'
 import TaskModal from '../components/TaskModal'
-import { celebrateCompletedTask } from '../lib/taskCelebration'
+import { celebrateCompletedTask } from '../lib/celebrationEffect'
 import useAuth from '../context/useAuth'
 import useTaskList from '../components/hooks/useTaskList'
 
