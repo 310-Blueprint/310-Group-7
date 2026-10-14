@@ -31,6 +31,8 @@ the pure logic that currently has no coverage at all:
 
 - `findContainer` and the drag handlers in `DashboardPage.jsx`.
 - The status and column mapping in `src/lib/applications.js`.
+- The aggregation in `src/lib/analytics.js`, which is already pure and takes
+  its columns as an argument.
 - `toDisplayName` and the UUID-prefix regex in `DocumentsPage.jsx`.
 - Form validation in `ApplicationModal.jsx`.
 - Both route guards, which are small but security-relevant.
@@ -54,8 +56,14 @@ the pure logic that currently has no coverage at all:
 - **`rejected` status has no board column.** The database CHECK constraint
   allows it, but `src/pages/dashboardData.js` defines four columns and
   `STATUS_BY_COLUMN` has no entry for it, so a row with that status is silently
-  invisible. Either add a fifth column or drop the value from the constraint.
-  See [database.md](database.md).
+  invisible on the board, and Job Analytics can only count it as sent. Either
+  add a fifth column or drop the value from the constraint. See
+  [database.md](database.md).
+- **No application stage history.** `applications` stores only the current
+  `status`. Job Analytics infers the furthest stage reached from it, so moving a
+  card backwards rewrites its conversion history, and time-in-stage metrics are
+  impossible. A table of status changes would fix both. See
+  [job-analytics.md](job-analytics.md).
 - **The `documents` table is unused.** [`schema.sql`](../schema.sql) creates it,
   but `DocumentsPage.jsx` works directly off Storage and derives display names
   from the path, so `doc_type` is not recorded anywhere and the interface cannot
@@ -96,9 +104,12 @@ enough to be broken into several issues.
 | Task management | Reminders and to-dos attached to an application. |
 | Notifications and reminders | Depends on the calendar and task work. |
 | Job search and filtering | Searching and filtering across the board. |
-| Job analytics | Response rates, time-to-interview, and similar, over a user's own applications. |
 | Saved internships | Roles saved to apply to later, distinct from applications already in progress. |
 | AI CV and cover letter tailorer | The original motivation for the project: tailoring stored documents to a specific role. Needs the `documents` table wired up first so document type is known. |
+
+Job analytics has shipped as an MVP: totals, a stage breakdown, and conversion
+rates. Response times, time-to-interview, and a date-range filter depend on the
+stage history gap above; see [job-analytics.md](job-analytics.md).
 
 ## Documentation and repository setup
 

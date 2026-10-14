@@ -12,6 +12,7 @@ is, how to install it, or how to contribute, start with the
 | [database.md](database.md) | What the Supabase tables hold, how they map onto the UI, and why row-level security matters. |
 | [dashboard.md](dashboard.md) | The kanban board: columns, adding and deleting applications, drag and drop. |
 | [documents.md](documents.md) | The documents archive: upload, download, delete, and how Storage is laid out. |
+| [job-analytics.md](job-analytics.md) | The analytics dashboard: which metrics are shown, and how they are derived from applications. |
 | [notifications.md](notifications.md) | Upcoming deadline reminders, browser subscriptions, and scheduled push alerts. |
 | [ui-and-layout.md](ui-and-layout.md) | Shared components, design tokens, artwork layering, and responsive breakpoints. |
 | [ROADMAP.md](ROADMAP.md) | Known gaps and the work planned for A2. |

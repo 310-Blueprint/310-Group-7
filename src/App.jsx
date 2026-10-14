@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage'
 import DocumentsPage from './pages/DocumentsPage'
 import TaskListPage from './pages/TaskListPage'
 import CalendarPage from './pages/CalendarPage'
+import AnalyticsPage from './pages/AnalyticsPage'
 
 /*
  * Routing table. Three kinds of route:
@@ -81,6 +82,14 @@ function App() {
         element={
           <ProtectedRoute>
             <CalendarPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <AnalyticsPage />
           </ProtectedRoute>
         }
       />

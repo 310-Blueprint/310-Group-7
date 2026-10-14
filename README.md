@@ -33,11 +33,14 @@ a single place.
 - **Deadline reminders.** Applications due today or within two days appear in
   the dashboard. Users can enable desktop alerts, including scheduled push
   notifications while Pipeline is closed when the deployment is configured.
+- **Job analytics.** A read-only dashboard of totals, a breakdown by stage, and
+  Applied to Interview and Interview to Offer conversion rates, derived from
+  the applications on the board.
 
 ### Planned for the next iteration
 
-Interview calendar, task management, job search and filtering, job analytics,
-saved internships, and an AI cover letter and CV tailor. See
+Interview calendar, task management, job search and filtering, saved
+internships, and an AI cover letter and CV tailor. See
 [docs/ROADMAP.md](docs/ROADMAP.md) for the full list, including known gaps in
 what already works.
 
@@ -162,6 +165,7 @@ Technical documentation for contributors lives in [docs/](docs/):
 | [database.md](docs/database.md) | The Supabase schema and why row-level security matters |
 | [dashboard.md](docs/dashboard.md) | The kanban board and drag and drop |
 | [documents.md](docs/documents.md) | The documents archive and storage layout |
+| [job-analytics.md](docs/job-analytics.md) | The analytics dashboard and how its metrics are derived |
 | [notifications.md](docs/notifications.md) | In-app reminders and background push alerts |
 | [ui-and-layout.md](docs/ui-and-layout.md) | Shared components, design tokens, and breakpoints |
 | [ROADMAP.md](docs/ROADMAP.md) | Known gaps and work planned for the next iteration |
