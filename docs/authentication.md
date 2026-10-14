@@ -198,8 +198,9 @@ which matters most for the emailed reset link. Add the deployed
 
 ## Future work
 
-- The greeting on both the dashboard and documents pages is still the hardcoded
-  "Hello, Stranger", when `useAuth()` already exposes the signed-in user.
+- `PageGreeting` currently uses the generic “Hello, Busy Beaver” text rather
+  than the signed-in user's name. `useAuth()` exposes the user, so a future
+  profile-aware greeting could personalize it consistently across pages.
 - There is no `*` catch-all route, so an unknown URL renders blank.
 - There is no user profile feature: no `/profile` route, no profile table, and
   no way to change an email or display name.
