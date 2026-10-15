@@ -123,9 +123,11 @@ path, which is why there is no notion of document type in the interface.
 
 ## Verification
 
-There are no automated tests. Verify by hand:
+Run `npm test` for automated coverage of loading and empty states, signed URL
+mapping, UUID display names, uploads, downloads, deletion, and storage failures.
+Storage is mocked, so also verify the real integration by hand:
 
-- `npm run lint` and `npm run build` pass.
+- `npm test`, `npm run codestyle`, and `npm run build` pass.
 - Upload by drag-and-drop and by the file picker, including multiple files at
   once.
 - Confirm uploaded files appear in the `documents` bucket in the Supabase

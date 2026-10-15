@@ -196,6 +196,16 @@ loading `/reset-password` or `/documents` directly returns a 404 on Netlify,
 which matters most for the emailed reset link. Add the deployed
 `/reset-password` URL to the Redirect URLs allowlist too.
 
+## Verification
+
+Run `npm test` for automated login coverage. It checks successful and failed
+sign-in, pending submissions, retrying after an error, password-reset feedback,
+and returning to an originally requested protected page. Supabase is mocked, so
+no credentials or real accounts are used.
+
+Also run `npm run codestyle` and `npm run build`, then sign in manually once to
+confirm the deployed Supabase configuration works.
+
 ## Future work
 
 - `PageGreeting` currently uses the generic “Hello, Busy Beaver” text rather

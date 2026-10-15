@@ -19,8 +19,9 @@ The steps a reviewer should follow to see this working.
 
 ## Verification
 
-The project has no automated tests yet, so say what you actually checked.
+Say what was checked automatically and by hand.
 
+- [ ] `npm test` passes
 - [ ] `npm run codestyle` passes
 - [ ] `npm run build` passes
 - [ ] Ran the app and confirmed the affected flows work
