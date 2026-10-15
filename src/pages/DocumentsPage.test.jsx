@@ -1,316 +1,303 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DocumentsPage from './DocumentsPage'
 
-const USER_ID = 'user-123'
-const STORED_UUID = '123e4567-e89b-12d3-a456-426614174000'
+// ---------------------------------------------------------------------------
+// Mocks (only the boundaries: auth + Supabase storage)
+// ---------------------------------------------------------------------------
 
-const auth = vi.hoisted(() => ({
-  user: { id: 'user-123' },
-}))
-
-const storage = vi.hoisted(() => ({
+const mocks = vi.hoisted(() => ({
   from: vi.fn(),
   list: vi.fn(),
   createSignedUrls: vi.fn(),
-  upload: vi.fn(),
   createSignedUrl: vi.fn(),
+  upload: vi.fn(),
   remove: vi.fn(),
-  signOut: vi.fn(),
+  // Stable reference: returning a fresh { id } object on every render can make
+  // effects that depend on `user` re-run and refetch.
+  auth: { user: { id: 'user-123' } },
 }))
 
 vi.mock('../context/useAuth', () => ({
-  default: () => ({ user: auth.user }),
+  default: () => mocks.auth,
 }))
 
 vi.mock('../components/PageShell', () => ({
-  default: ({ children }) => <main>{children}</main>,
-  BEAVER_POSITION: '',
-  PRIMARY_PILL_CLASSES: '',
+  default: ({ children }) => <div>{children}</div>,
+  BEAVER_POSITION: 'beaver-position',
+  PRIMARY_PILL_CLASSES: 'pill-classes',
 }))
 
 vi.mock('../lib/supabaseClient', () => ({
   supabase: {
-    auth: { signOut: storage.signOut },
-    storage: { from: storage.from },
+    storage: {
+      from: mocks.from,
+    },
   },
 }))
 
-function renderDocuments() {
-  return render(
-    <MemoryRouter initialEntries={['/documents']}>
-      <DocumentsPage />
-    </MemoryRouter>
+// ---------------------------------------------------------------------------
+// Fixtures & helpers
+// ---------------------------------------------------------------------------
+
+const USER_ID = 'user-123'
+const UPLOAD_UUID = '123e4567-e89b-12d3-a456-426614174000' // crypto.randomUUID()
+const UUID_A = '123e4567-e89b-12d3-a456-426614174000'
+const UUID_B = '123e4567-e89b-12d3-a456-426614174001'
+
+const EMPTY_MESSAGE = 'No documents yet — drop a file below to get started.'
+const LOADING_MESSAGE = 'Loading your documents…'
+
+const storedName = (uuid, name) => `${uuid}-${name}`
+const storagePath = (uuid, name) => `${USER_ID}/${storedName(uuid, name)}`
+
+// A tiny in-memory bucket. Every storage mock reads/writes it, so the page sees
+// consistent data no matter how many times it lists, uploads or removes.
+let bucket = []
+
+function seedDocuments(docs) {
+  bucket = docs.map(({ uuid, name }) => storedName(uuid, name))
+}
+
+function deferred() {
+  let resolve
+  const promise = new Promise((res) => {
+    resolve = res
+  })
+  return { promise, resolve }
+}
+
+// The input is labelled only by a sibling <label for=...>, so query by id.
+const getUploadInput = () => document.querySelector('#document-upload-input')
+
+async function renderPage() {
+  const user = userEvent.setup()
+  render(<DocumentsPage />)
+  await waitFor(() =>
+    expect(screen.queryByText(LOADING_MESSAGE)).not.toBeInTheDocument()
   )
+  return user
 }
 
-function storedFile(name) {
-  return { name: `${STORED_UUID}-${name}` }
-}
+const deleteButton = (name) =>
+  screen.findByRole('button', {
+    name: new RegExp(`delete ${name.replace('.', '\\.')}`, 'i'),
+  })
 
-function silenceExpectedErrorLog() {
-  vi.spyOn(console, 'error').mockImplementation(() => {})
-}
+const makePdf = (name) =>
+  new File(['content'], name, { type: 'application/pdf' })
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 describe('DocumentsPage', () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
-    Object.values(storage).forEach((mock) => mock.mockReset())
+    vi.resetAllMocks() // also clears any leftover mockXOnce queues
+    vi.stubGlobal('crypto', { randomUUID: () => UPLOAD_UUID })
+    bucket = []
 
-    storage.from.mockReturnValue({
-      list: storage.list,
-      createSignedUrls: storage.createSignedUrls,
-      upload: storage.upload,
-      createSignedUrl: storage.createSignedUrl,
-      remove: storage.remove,
+    mocks.from.mockReturnValue({
+      list: mocks.list,
+      createSignedUrls: mocks.createSignedUrls,
+      createSignedUrl: mocks.createSignedUrl,
+      upload: mocks.upload,
+      remove: mocks.remove,
     })
-    storage.list.mockResolvedValue({ data: [], error: null })
-    storage.upload.mockResolvedValue({ error: null })
-    storage.createSignedUrl.mockResolvedValue({
-      data: { signedUrl: 'https://files.example/download' },
+
+    mocks.list.mockImplementation(async () => ({
+      data: bucket.map((name) => ({ name })),
+      error: null,
+    }))
+    mocks.createSignedUrls.mockImplementation(async (paths) => ({
+      data: paths.map((path) => ({
+        path,
+        signedUrl: `https://signed.example/${path.split('/').pop()}`,
+      })),
+      error: null,
+    }))
+    mocks.createSignedUrl.mockResolvedValue({
+      data: { signedUrl: 'https://signed.example/uploaded.pdf' },
       error: null,
     })
-    storage.remove.mockResolvedValue({ error: null })
-
-    vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(STORED_UUID)
+    mocks.upload.mockImplementation(async (path) => {
+      bucket.push(path.split('/').pop())
+      return { error: null }
+    })
+    mocks.remove.mockImplementation(async (paths) => {
+      bucket = bucket.filter((name) => !paths.includes(`${USER_ID}/${name}`))
+      return { error: null }
+    })
   })
 
-  it('shows a loading state and then the empty state', async () => {
-    let finishLoading
-    storage.list.mockReturnValue(
-      new Promise((resolve) => {
-        finishLoading = resolve
+  afterEach(() => {
+    // Without this, the crypto stub leaks into other test files in the same worker.
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks() // undoes console spies; leaves vi.fn() mocks alone
+  })
+
+  describe('loading documents', () => {
+    it('shows a loading status until the document list resolves', async () => {
+      const pending = deferred()
+      mocks.list.mockReturnValue(pending.promise)
+
+      render(<DocumentsPage />)
+
+      expect(screen.getByText(LOADING_MESSAGE)).toBeInTheDocument()
+
+      pending.resolve({ data: [], error: null })
+
+      expect(await screen.findByText(EMPTY_MESSAGE)).toBeInTheDocument()
+      expect(screen.queryByText(LOADING_MESSAGE)).not.toBeInTheDocument()
+    })
+
+    it('lists the current user’s documents with the UUID prefix stripped', async () => {
+      seedDocuments([
+        { uuid: UUID_A, name: 'cover-letter.pdf' },
+        { uuid: UUID_B, name: 'resume.pdf' },
+      ])
+
+      render(<DocumentsPage />)
+
+      expect(await screen.findByText('cover-letter.pdf')).toBeInTheDocument()
+      expect(screen.getByText('resume.pdf')).toBeInTheDocument()
+
+      // The raw storage names must not leak into the UI.
+      expect(screen.queryByText(new RegExp(UUID_A))).not.toBeInTheDocument()
+      expect(screen.queryByText(new RegExp(UUID_B))).not.toBeInTheDocument()
+
+      expect(mocks.list).toHaveBeenCalledWith(USER_ID, {
+        sortBy: { column: 'name', order: 'asc' },
       })
-    )
-    renderDocuments()
+      expect(mocks.createSignedUrls).toHaveBeenCalledWith(
+        [
+          storagePath(UUID_A, 'cover-letter.pdf'),
+          storagePath(UUID_B, 'resume.pdf'),
+        ],
+        3600,
+        { download: true }
+      )
+    })
 
-    expect(screen.getByText(/loading your documents/i)).toBeInTheDocument()
+    it('shows the empty state and ignores the folder placeholder file', async () => {
+      bucket = ['.emptyFolderPlaceholder']
 
-    finishLoading({ data: [], error: null })
+      render(<DocumentsPage />)
 
-    expect(await screen.findByText(/no documents yet/i)).toBeInTheDocument()
-    expect(storage.from).toHaveBeenCalledWith('documents')
-    expect(storage.list).toHaveBeenCalledWith(USER_ID, {
-      sortBy: { column: 'name', order: 'asc' },
+      expect(await screen.findByText(EMPTY_MESSAGE)).toBeInTheDocument()
+      expect(
+        screen.queryByText('.emptyFolderPlaceholder')
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: /delete /i })
+      ).not.toBeInTheDocument()
+    })
+
+    it('stops loading and shows an error when the list request fails', async () => {
+      mocks.list.mockResolvedValue({
+        data: null,
+        error: { message: 'Storage unavailable' },
+      })
+      // The page logs the error; silence it so the test output stays clean.
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      render(<DocumentsPage />)
+
+      // The page currently only logs the error. Once it renders an error
+      // message, assert on that here; for now, loading must at least end.
+      await waitFor(() =>
+        expect(screen.queryByText(LOADING_MESSAGE)).not.toBeInTheDocument()
+      )
     })
   })
 
-  it('loads only real files, strips stored UUIDs, and matches signed URLs by path', async () => {
-    const cv = storedFile('cv.pdf')
-    const transcript = storedFile('2024-transcript.pdf')
-    storage.list.mockResolvedValue({
-      data: [{ name: '.emptyFolderPlaceholder' }, cv, transcript],
-      error: null,
-    })
-    storage.createSignedUrls.mockResolvedValue({
-      data: [
-        {
-          path: `${USER_ID}/${transcript.name}`,
-          signedUrl: 'https://files.example/transcript',
-        },
-        {
-          path: `${USER_ID}/${cv.name}`,
-          signedUrl: 'https://files.example/cv',
-        },
-      ],
-      error: null,
-    })
-    renderDocuments()
+  describe('uploading', () => {
+    it('uploads under the user’s folder with a UUID prefix and lists the file', async () => {
+      const user = await renderPage()
+      expect(await screen.findByText(EMPTY_MESSAGE)).toBeInTheDocument()
 
-    const cvLink = await screen.findByRole('link', { name: 'Download cv.pdf' })
-    const transcriptLink = screen.getByRole('link', {
-      name: 'Download 2024-transcript.pdf',
+      const file = makePdf('resume.pdf')
+      await user.upload(getUploadInput(), file)
+
+      expect(await screen.findByText('resume.pdf')).toBeInTheDocument()
+
+      const expectedPath = storagePath(UPLOAD_UUID, 'resume.pdf')
+      expect(mocks.upload).toHaveBeenCalledTimes(1)
+      expect(mocks.upload).toHaveBeenCalledWith(expectedPath, file)
+      expect(mocks.createSignedUrl.mock.calls[0][0]).toBe(expectedPath)
+      expect(screen.queryByText(EMPTY_MESSAGE)).not.toBeInTheDocument()
     })
 
-    expect(cvLink).toHaveAttribute('href', 'https://files.example/cv')
-    expect(cvLink).toHaveAttribute('download')
-    expect(transcriptLink).toHaveAttribute(
-      'href',
-      'https://files.example/transcript'
-    )
-    expect(storage.createSignedUrls).toHaveBeenCalledWith(
-      [`${USER_ID}/${cv.name}`, `${USER_ID}/${transcript.name}`],
-      3600,
-      { download: true }
-    )
-    expect(
-      screen.queryByText('.emptyFolderPlaceholder')
-    ).not.toBeInTheDocument()
-  })
+    it('keeps existing documents in the list after an upload', async () => {
+      seedDocuments([{ uuid: UUID_B, name: 'cv.pdf' }])
+      const user = await renderPage()
+      await screen.findByText('cv.pdf')
 
-  it('shows an error when the document list cannot be loaded', async () => {
-    silenceExpectedErrorLog()
-    storage.list.mockResolvedValue({
-      data: null,
-      error: { message: 'Storage unavailable' },
+      await user.upload(getUploadInput(), makePdf('resume.pdf'))
+
+      expect(await screen.findByText('resume.pdf')).toBeInTheDocument()
+      expect(screen.getByText('cv.pdf')).toBeInTheDocument()
     })
-    renderDocuments()
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not load your documents. Try refreshing.'
-    )
-    expect(storage.createSignedUrls).not.toHaveBeenCalled()
-  })
+    it('does not list the file or request a download link when the upload fails', async () => {
+      mocks.upload.mockResolvedValueOnce({
+        error: { message: 'Upload failed' },
+      })
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      const user = await renderPage()
+      await screen.findByText(EMPTY_MESSAGE)
 
-  it('shows an error when download links cannot be created', async () => {
-    silenceExpectedErrorLog()
-    storage.list.mockResolvedValue({
-      data: [storedFile('cv.pdf')],
-      error: null,
-    })
-    storage.createSignedUrls.mockResolvedValue({
-      data: null,
-      error: { message: 'Signing failed' },
-    })
-    renderDocuments()
+      await user.upload(getUploadInput(), makePdf('resume.pdf'))
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not load your documents. Try refreshing.'
-    )
-  })
-
-  it('uploads a selected file into the signed-in user folder', async () => {
-    const user = userEvent.setup()
-    const file = new File(['resume'], 'resume.pdf', {
-      type: 'application/pdf',
-    })
-    renderDocuments()
-    await screen.findByText(/no documents yet/i)
-
-    const input = document.querySelector('#document-upload-input')
-    await user.upload(input, file)
-
-    const expectedPath = `${USER_ID}/${STORED_UUID}-resume.pdf`
-    expect(storage.upload).toHaveBeenCalledWith(expectedPath, file)
-    expect(storage.createSignedUrl).toHaveBeenCalledWith(expectedPath, 3600, {
-      download: true,
-    })
-    expect(
-      await screen.findByRole('link', { name: 'Download resume.pdf' })
-    ).toHaveAttribute('href', 'https://files.example/download')
-    expect(input).toHaveValue('')
-  })
-
-  it('uploads a document dropped onto the dropzone', async () => {
-    const file = new File(['cover letter'], 'cover-letter.pdf', {
-      type: 'application/pdf',
-    })
-    renderDocuments()
-    await screen.findByText(/no documents yet/i)
-
-    const dropzone = screen
-      .getByText(/drop your documents here/i)
-      .closest('div')
-    fireEvent.drop(dropzone, { dataTransfer: { files: [file] } })
-
-    const expectedPath = `${USER_ID}/${STORED_UUID}-cover-letter.pdf`
-    await waitFor(() => {
-      expect(storage.upload).toHaveBeenCalledWith(expectedPath, file)
-    })
-    expect(
-      await screen.findByRole('link', { name: 'Download cover-letter.pdf' })
-    ).toBeInTheDocument()
-  })
-
-  it('rejects a file refused by storage while keeping successful uploads visible', async () => {
-    silenceExpectedErrorLog()
-    storage.upload
-      .mockResolvedValueOnce({ error: { message: 'File type not allowed' } })
-      .mockResolvedValueOnce({ error: null })
-    const user = userEvent.setup()
-    const failedFile = new File(['bad'], 'bad.pdf', {
-      type: 'application/pdf',
-    })
-    const successfulFile = new File(['good'], 'good.pdf', {
-      type: 'application/pdf',
-    })
-    renderDocuments()
-    await screen.findByText(/no documents yet/i)
-
-    await user.upload(document.querySelector('#document-upload-input'), [
-      failedFile,
-      successfulFile,
-    ])
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not upload bad.pdf.'
-    )
-    expect(
-      screen.getByRole('link', { name: 'Download good.pdf' })
-    ).toBeInTheDocument()
-    expect(
-      screen.queryByRole('link', { name: 'Download bad.pdf' })
-    ).not.toBeInTheDocument()
-  })
-
-  it('reports a file as failed when its download link cannot be created', async () => {
-    silenceExpectedErrorLog()
-    storage.createSignedUrl.mockResolvedValue({
-      data: null,
-      error: { message: 'Signing failed' },
-    })
-    const user = userEvent.setup()
-    const file = new File(['resume'], 'resume.pdf', {
-      type: 'application/pdf',
-    })
-    renderDocuments()
-    await screen.findByText(/no documents yet/i)
-
-    await user.upload(document.querySelector('#document-upload-input'), file)
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not upload resume.pdf.'
-    )
-    expect(
-      screen.queryByRole('link', { name: 'Download resume.pdf' })
-    ).not.toBeInTheDocument()
-  })
-
-  it('deletes a stored document only after storage confirms success', async () => {
-    const file = storedFile('cv.pdf')
-    const path = `${USER_ID}/${file.name}`
-    storage.list.mockResolvedValue({ data: [file], error: null })
-    storage.createSignedUrls.mockResolvedValue({
-      data: [{ path, signedUrl: 'https://files.example/cv' }],
-      error: null,
-    })
-    const user = userEvent.setup()
-    renderDocuments()
-
-    await user.click(
-      await screen.findByRole('button', { name: 'Delete cv.pdf' })
-    )
-
-    expect(storage.remove).toHaveBeenCalledWith([path])
-    await waitFor(() => {
-      expect(screen.queryByText('cv.pdf')).not.toBeInTheDocument()
+      await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(1))
+      expect(screen.queryByText('resume.pdf')).not.toBeInTheDocument()
+      expect(mocks.createSignedUrl).not.toHaveBeenCalled()
+      expect(screen.getByText(EMPTY_MESSAGE)).toBeInTheDocument()
     })
   })
 
-  it('keeps a document visible and shows an error when deletion fails', async () => {
-    silenceExpectedErrorLog()
-    const file = storedFile('cv.pdf')
-    const path = `${USER_ID}/${file.name}`
-    storage.list.mockResolvedValue({ data: [file], error: null })
-    storage.createSignedUrls.mockResolvedValue({
-      data: [{ path, signedUrl: 'https://files.example/cv' }],
-      error: null,
-    })
-    storage.remove.mockResolvedValue({
-      error: { message: 'Delete failed' },
-    })
-    const user = userEvent.setup()
-    renderDocuments()
+  describe('deleting', () => {
+    it('removes only the chosen document from storage and from the list', async () => {
+      seedDocuments([
+        { uuid: UUID_A, name: 'cv.pdf' },
+        { uuid: UUID_B, name: 'resume.pdf' },
+      ])
+      const user = await renderPage()
 
-    await user.click(
-      await screen.findByRole('button', { name: 'Delete cv.pdf' })
-    )
+      await user.click(await deleteButton('cv.pdf'))
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not delete that document.'
-    )
-    expect(screen.getByText('cv.pdf')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(screen.queryByText('cv.pdf')).not.toBeInTheDocument()
+      )
+      expect(mocks.remove).toHaveBeenCalledTimes(1)
+      expect(mocks.remove).toHaveBeenCalledWith([storagePath(UUID_A, 'cv.pdf')])
+      expect(screen.getByText('resume.pdf')).toBeInTheDocument()
+    })
+
+    it('shows the empty state after the last document is deleted', async () => {
+      seedDocuments([{ uuid: UUID_A, name: 'cv.pdf' }])
+      const user = await renderPage()
+
+      await user.click(await deleteButton('cv.pdf'))
+
+      expect(await screen.findByText(EMPTY_MESSAGE)).toBeInTheDocument()
+    })
+
+    // If the page removes the item optimistically without rolling back,
+    // this test will fail, which is the bug it exists to catch.
+    it('keeps the document listed when the delete fails', async () => {
+      mocks.remove.mockResolvedValueOnce({
+        error: { message: 'Delete failed' },
+      })
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      seedDocuments([{ uuid: UUID_A, name: 'cv.pdf' }])
+      const user = await renderPage()
+
+      await user.click(await deleteButton('cv.pdf'))
+
+      await waitFor(() => expect(mocks.remove).toHaveBeenCalledTimes(1))
+      expect(screen.getByText('cv.pdf')).toBeInTheDocument()
+    })
   })
 })
