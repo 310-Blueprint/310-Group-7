@@ -12,7 +12,7 @@ filtering; see [database.md](database.md).
 
 ## The board model
 
-`src/pages/dashboardData.js` defines the four workflow stages and nothing else:
+`src/pages/dashboard/dashboardData.js` defines the four workflow stages and nothing else:
 
 | Column | Theme token |
 | --- | --- |
@@ -112,11 +112,11 @@ droppable ids. The board tracks membership itself via a small
 
 The pieces:
 
-- **`src/components/SortableApplicationCard.jsx`** is a thin wrapper around
+- **`src/components/dashboard/SortableApplicationCard.jsx`** is a thin wrapper around
   `ApplicationCard` that calls `useSortable` and applies the drag transform and
   listeners to a wrapping `<div>`. This keeps `ApplicationCard` purely
   presentational, with no drag-related props.
-- **`src/components/StatusColumn.jsx`** is the drop target. `useDroppable({ id })`
+- **`src/components/dashboard/StatusColumn.jsx`** is the drop target. `useDroppable({ id })`
   sits on the column's content `<div>` so an empty column can still be dropped
   into, and the card list is wrapped in a `SortableContext` with
   `verticalListSortingStrategy`.

@@ -1,13 +1,35 @@
 # UI and layout
 
-Shared components, design tokens, artwork layering, and responsive behaviour.
+Source folder layout, shared components, design tokens, artwork layering, and
+responsive behaviour.
 The feature documents cover what each page does;
 this covers how everything looks and holds together.
 
+## Source layout
+
+Components and pages are grouped by feature, using the same names as the
+feature documents. A component used by only one feature lives in that
+feature's folder; one shared across features lives in `layout/`, `routing/`, or
+`ui/`.
+
+| Folder | Holds |
+| --- | --- |
+| `src/pages/<feature>/` | One route's page component, its page-only data, and its tests. Features: `auth`, `dashboard`, `documents`, `tasks`, `calendar`, `analytics`. |
+| `src/components/<feature>/` | Components used only by that feature's pages. |
+| `src/components/layout/` | The authenticated page frame: `PageShell`, `Sidebar`, `PageGreeting`, `Logo`. |
+| `src/components/routing/` | Route guards and their loading screen. |
+| `src/components/ui/` | Generic building blocks: `FormMessage`, `ModalDialog`, `ModalField`. |
+| `src/hooks/` | All custom React hooks. |
+| `src/lib/` | Supabase access and pure logic, with no React. |
+
+When a feature-only component starts being used by a second feature, move it to
+`ui/` (or `layout/`) rather than importing across feature folders. Tests sit
+next to the file they cover, as `Name.test.jsx`.
+
 ## Shared components
 
-All in `src/components/`. Each one owns how it looks; the caller owns where it
-sits, with spacing coming in via `className`.
+Each one owns how it looks; the caller owns where it sits, with spacing coming
+in via `className`.
 
 **`AuthCard`** is the shared shell for the four auth pages: page background,
 logo, heading, the card itself, and all four decorative images. Takes `title`

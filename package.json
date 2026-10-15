@@ -7,13 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",
-    "prettier": "prettier . --check",
+    "prettier": "prettier --write .",
     "codestyle": "eslint . && prettier . --check",
     "prepare": "husky install",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

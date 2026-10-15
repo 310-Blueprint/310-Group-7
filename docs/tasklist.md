@@ -12,7 +12,7 @@ than a client-side `user_id` filter; see [database.md](database.md).
 
 ## The board model
 
-`src/pages/TaskListPage.jsx` defines the task columns and their theme tokens:
+`src/pages/tasks/TaskListPage.jsx` defines the task columns and their theme tokens:
 
 | Column | Status stored in Supabase | Theme token |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ their owner. See [`schema.sql`](../schema.sql) and [database.md](database.md).
 
 ## Adding a task
 
-The `+ Add task` button opens `src/components/TaskModal.jsx`, which is a popup
+The `+ Add task` button opens `src/components/tasks/TaskModal.jsx`, which is a popup
 window that has multiple fields, both compulsory and optional for the user to
 fill out.
 
@@ -116,12 +116,12 @@ tracks column membership using `findContainer(tasks, id)`:
 
 The components are separated as follows:
 
-- **`src/components/TaskCard.jsx`** displays a task's title, description, due
+- **`src/components/tasks/TaskCard.jsx`** displays a task's title, description, due
   date, and optional edit/delete controls without implementing dragging.
-- **`src/components/SortableTaskCard.jsx`** wraps `TaskCard` with `useSortable`,
+- **`src/components/tasks/SortableTaskCard.jsx`** wraps `TaskCard` with `useSortable`,
   applies drag transforms, and forwards edit/delete callbacks. Those buttons
   stop event propagation so they can be clicked without starting a drag.
-- **`src/components/TaskColumn.jsx`** uses `useDroppable` and a
+- **`src/components/tasks/TaskColumn.jsx`** uses `useDroppable` and a
   `SortableContext` with `verticalListSortingStrategy` for the editable columns.
   Due Soon uses plain `TaskCard` components and does not support editing or
   dragging tasks into it.

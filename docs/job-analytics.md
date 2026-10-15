@@ -80,7 +80,7 @@ Board columns are passed in rather than imported.
 `fetchApplications()` in `src/lib/applications.js`, which remains the only module
 that queries the table. It memoises the summary and returns
 `{ summary, isLoading, loadError }`. Its `columns` argument defaults to
-`COLUMNS` from `src/pages/dashboardData.js`; a caller passing its own must pass
+`COLUMNS` from `src/pages/dashboard/dashboardData.js`; a caller passing its own must pass
 a stable array, or the summary is recomputed on every render.
 
 ## Freshness

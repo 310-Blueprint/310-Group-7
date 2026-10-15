@@ -61,7 +61,7 @@ The status mapping is the important half:
 | `rejected` | **no column** |
 
 `rejected` is allowed by the CHECK constraint but has no entry in
-`STATUS_BY_COLUMN` and no column in `src/pages/dashboardData.js`. A row with
+`STATUS_BY_COLUMN` and no column in `src/pages/dashboard/dashboardData.js`. A row with
 that status is silently invisible on the board, and Job Analytics counts it as
 sent but no further. Either add a fifth column or drop the value from the
 constraint; see [ROADMAP.md](ROADMAP.md).
@@ -74,7 +74,7 @@ current `status` is stored, with no history of earlier stages, so analytics
 infers the furthest stage an application reached from where it is now. See
 [job-analytics.md](job-analytics.md).
 
-The board's column titles are defined once in `src/pages/dashboardData.js`. If
+The board's column titles are defined once in `src/pages/dashboard/dashboardData.js`. If
 you add or rename a column there, update `STATUS_BY_COLUMN` and the CHECK
 constraint to match, or inserts will fail.
 
@@ -128,7 +128,7 @@ Metadata about an uploaded file: `doc_type` (`cv`, `cover_letter`, or
 `transcript`), the original `file_name` for display, and the `storage_path`
 inside the bucket.
 
-**No code reads or writes this table yet.** `src/pages/DocumentsPage.jsx` works
+**No code reads or writes this table yet.** `src/pages/documents/DocumentsPage.jsx` works
 directly against Storage and derives the display name by stripping the UUID
 prefix off the storage path. That means document type is not recorded anywhere,
 and a file whose original name contained something that looks like a UUID

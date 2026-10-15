@@ -6,7 +6,7 @@ const STAGE_RANK = {
   offer: 3,
 }
 
-// Funnel on page, counts applications that have *reached* each stage, 
+// Funnel on page, counts applications that have *reached* each stage,
 // NOT the number of applications currently in that stage.
 export const FUNNEL_STAGES = [
   { id: 'applied', title: 'Sent' },
@@ -20,7 +20,9 @@ function rankOf(status) {
 
 export function countReached(applications, status) {
   const target = rankOf(status)
-  return applications.filter((application) => rankOf(application.status) >= target).length
+  return applications.filter(
+    (application) => rankOf(application.status) >= target
+  ).length
 }
 
 // NULL required to avoid displaying 0% for stages without any applications.
@@ -34,7 +36,9 @@ export function formatPercentage(rate) {
 
 export function countByStage(applications, columns) {
   return columns.map((column) => {
-    const count = applications.filter((application) => application.status === column.id).length
+    const count = applications.filter(
+      (application) => application.status === column.id
+    ).length
 
     return {
       id: column.id,

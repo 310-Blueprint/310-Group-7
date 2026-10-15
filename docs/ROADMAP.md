@@ -47,7 +47,7 @@ Coverage is still incomplete. The highest-value next targets are:
 ### Data model
 
 - **`rejected` status has no board column.** The database CHECK constraint
-  allows it, but `src/pages/dashboardData.js` defines four columns and
+  allows it, but `src/pages/dashboard/dashboardData.js` defines four columns and
   `STATUS_BY_COLUMN` has no entry for it, so a row with that status is silently
   invisible on the board, and Job Analytics can only count it as sent. Either
   add a fifth column or drop the value from the constraint. See

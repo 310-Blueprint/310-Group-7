@@ -25,10 +25,10 @@ covered in [documents.md](documents.md).
 | `src/context/AuthContext.js` | The context object, alone in its own file. |
 | `src/context/AuthProvider.jsx` | Tracks the session app-wide. |
 | `src/context/useAuth.js` | `const { user, session, loading } = useAuth()` |
-| `src/components/ProtectedRoute.jsx` | Wraps pages needing a signed-in user. |
-| `src/components/PublicOnlyRoute.jsx` | Wraps the auth forms. |
-| `src/components/RouteLoading.jsx` | Shown while the session is being restored. |
-| `src/components/FormMessage.jsx` | Inline error or success line, with the right ARIA role. |
+| `src/components/routing/ProtectedRoute.jsx` | Wraps pages needing a signed-in user. |
+| `src/components/routing/PublicOnlyRoute.jsx` | Wraps the auth forms. |
+| `src/components/routing/RouteLoading.jsx` | Shown while the session is being restored. |
+| `src/components/ui/FormMessage.jsx` | Inline error or success line, with the right ARIA role. |
 
 `AuthProvider` wraps `<App />` inside `<BrowserRouter>` in `src/main.jsx`.
 
@@ -88,12 +88,12 @@ This table is the single source of truth for routing. Routing itself lives in
 
 | Path | Page | File | Guard |
 | --- | --- | --- | --- |
-| `/` | Login | `src/pages/LoginPage.jsx` | public only |
-| `/signup` | Sign up | `src/pages/SignUpPage.jsx` | public only |
-| `/forgot-password` | Request a reset link | `src/pages/ForgotPasswordPage.jsx` | public only |
-| `/reset-password` | Set a new password | `src/pages/ResetPasswordPage.jsx` | **none** |
-| `/dashboard` | Dashboard | `src/pages/DashboardPage.jsx` | protected |
-| `/documents` | Documents | `src/pages/DocumentsPage.jsx` | protected |
+| `/` | Login | `src/pages/auth/LoginPage.jsx` | public only |
+| `/signup` | Sign up | `src/pages/auth/SignUpPage.jsx` | public only |
+| `/forgot-password` | Request a reset link | `src/pages/auth/ForgotPasswordPage.jsx` | public only |
+| `/reset-password` | Set a new password | `src/pages/auth/ResetPasswordPage.jsx` | **none** |
+| `/dashboard` | Dashboard | `src/pages/dashboard/DashboardPage.jsx` | protected |
+| `/documents` | Documents | `src/pages/documents/DocumentsPage.jsx` | protected |
 
 `/` is login for now. When the landing page lands it takes `/`, and login moves
 to `/login`: one line in `src/App.jsx`, plus the `to` props on the `AuthFooter`s

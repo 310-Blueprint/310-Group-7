@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchApplications } from '../lib/applications'
 import { buildAnalyticsSummary } from '../lib/analytics'
-import { COLUMNS } from '../pages/dashboardData'
+import { COLUMNS } from '../pages/dashboard/dashboardData'
 
 // Fetched once on mount, so the page reflects the latest board on each visit.
 export default function useApplicationAnalytics(columns = COLUMNS) {
@@ -31,7 +31,7 @@ export default function useApplicationAnalytics(columns = COLUMNS) {
 
   const summary = useMemo(
     () => buildAnalyticsSummary(applications, columns),
-    [applications, columns],
+    [applications, columns]
   )
 
   return { summary, isLoading, loadError }

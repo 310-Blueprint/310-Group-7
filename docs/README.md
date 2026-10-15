@@ -14,7 +14,7 @@ is, how to install it, or how to contribute, start with the
 | [documents.md](documents.md) | The documents archive: upload, download, delete, and how Storage is laid out. |
 | [job-analytics.md](job-analytics.md) | The analytics dashboard: which metrics are shown, and how they are derived from applications. |
 | [notifications.md](notifications.md) | Upcoming deadline reminders, browser subscriptions, and scheduled push alerts. |
-| [ui-and-layout.md](ui-and-layout.md) | Shared components, design tokens, artwork layering, and responsive breakpoints. |
+| [ui-and-layout.md](ui-and-layout.md) | Source folder layout, shared components, design tokens, artwork layering, and responsive breakpoints. |
 | [ROADMAP.md](ROADMAP.md) | Known gaps and the work planned for A2. |
 
 The runnable database schema lives at [`schema.sql`](../schema.sql) in the repo

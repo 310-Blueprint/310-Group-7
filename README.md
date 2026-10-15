@@ -169,7 +169,7 @@ Technical documentation for contributors lives in [docs/](docs/):
 | [documents.md](docs/documents.md) | The documents archive and storage layout |
 | [job-analytics.md](docs/job-analytics.md) | The analytics dashboard and how its metrics are derived |
 | [notifications.md](docs/notifications.md) | In-app reminders and background push alerts |
-| [ui-and-layout.md](docs/ui-and-layout.md) | Shared components, design tokens, and breakpoints |
+| [ui-and-layout.md](docs/ui-and-layout.md) | Source folder layout, shared components, design tokens, and breakpoints |
 | [ROADMAP.md](docs/ROADMAP.md) | Known gaps and work planned for the next iteration |
 
 The colour palette and design tokens are defined once in

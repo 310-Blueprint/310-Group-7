@@ -40,9 +40,9 @@ otherwise be empty; the page filters it out of the list.
 
 | File | Role |
 | --- | --- |
-| `src/pages/DocumentsPage.jsx` | Loading, uploading, downloading, deleting. |
-| `src/components/DocumentCard.jsx` | One document row: icon, name, download, delete. |
-| `src/components/DocumentDropzone.jsx` | Drag-and-drop area and file picker. |
+| `src/pages/documents/DocumentsPage.jsx` | Loading, uploading, downloading, deleting. |
+| `src/components/documents/DocumentCard.jsx` | One document row: icon, name, download, delete. |
+| `src/components/documents/DocumentDropzone.jsx` | Drag-and-drop area and file picker. |
 
 ## Loading
 
