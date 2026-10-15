@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import beaver from '../assets/beaver.png'
+import beaverArms from '../assets/beaverArms.png'
 import DocumentCard from '../components/DocumentCard'
 import Dropzone from '../components/DocumentDropzone'
 import FormMessage from '../components/FormMessage'
@@ -183,6 +184,12 @@ function DocumentsPage() {
       </header>
 
       <img src={beaver} alt="" aria-hidden="true" className={BEAVER_POSITION} />
+      <img
+        src={beaverArms}
+        alt=""
+        aria-hidden="true"
+        className={`${BEAVER_POSITION} z-20`}
+      />
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4">
         <div className="rounded-[1.75rem] bg-brand-blue p-4 sm:rounded-[2.5rem] sm:p-6">

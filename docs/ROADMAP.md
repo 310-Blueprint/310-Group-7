@@ -15,25 +15,18 @@ need no Supabase access beyond a working local setup. The greeting fix under
 that touches real application code: `useAuth()` already exposes the signed-in
 user, so it is a genuine improvement in a few lines.
 
-## The largest gap: no tests
+## The largest testing gap: incomplete coverage
 
-The project has **no test framework and no automated tests**. Nothing is
-configured in `package.json`, and there is no `test` script.
+The project uses **Vitest and React Testing Library**. Login and Documents have
+automated coverage for their main success, loading, and failure paths. Supabase
+and browser APIs are mocked so the suite runs without credentials or real data.
 
-This is the single biggest piece of outstanding work, and it blocks the
-contribution workflow in [CONTRIBUTING.md](../CONTRIBUTING.md), which requires
-that changes ship with tests. Until a framework is adopted, verification is
-manual, plus `npm run lint` and `npm run build`.
-
-Suggested starting point: Vitest with React Testing Library, which fits a Vite
-project without extra build configuration. The highest-value first targets are
-the pure logic that currently has no coverage at all:
+Coverage is still incomplete. The highest-value next targets are:
 
 - `findContainer` and the drag handlers in `DashboardPage.jsx`.
 - The status and column mapping in `src/lib/applications.js`.
 - The aggregation in `src/lib/analytics.js`, which is already pure and takes
   its columns as an argument.
-- `toDisplayName` and the UUID-prefix regex in `DocumentsPage.jsx`.
 - Form validation in `ApplicationModal.jsx`.
 - Both route guards, which are small but security-relevant.
 
@@ -114,10 +107,9 @@ stage history gap above; see [job-analytics.md](job-analytics.md).
 ## Documentation and repository setup
 
 - **No CI workflows.** `.github/` holds the issue and pull request templates but
-  no GitHub Actions. Lint and build are run by hand by the author and again by
-  the reviewer. A workflow running `npm run lint` and `npm run build` on every
-  pull request would catch breakage before review, and is the natural place to
-  hang a test suite once one exists.
+  no GitHub Actions. Tests, lint, and build are run by hand by the author and
+  again by the reviewer. A workflow running `npm test`, `npm run lint`, and
+  `npm run build` on every pull request would catch breakage before review.
 - **Sonar and Snyk are configured outside the repository.** There is no
   `sonar-project.properties` and no Snyk configuration tracked here, so the
   analysis setup is not reproducible by a new contributor from the repository

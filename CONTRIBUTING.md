@@ -87,24 +87,19 @@ Common types are `feature`, `fix`, `docs`, `refactor`, and `test`. For example
 
 ## Testing your changes
 
-The project does **not** currently have a test framework or any automated tests.
-Adopting one is the top item in [docs/ROADMAP.md](docs/ROADMAP.md), which lists
-suggested first targets. Contributions that add test infrastructure are
-especially welcome.
+The project uses **Vitest and React Testing Library**. Add or update tests when
+changing covered behaviour, and add new coverage where practical.
 
-Until then, every pull request must be verified by hand, and **the pull request
+Every pull request must also be verified by hand, and **the pull request
 description must say what was verified**. At a minimum:
 
+- `npm test` passes.
 - `npm run codestyle` passes.
 - `npm run build` passes.
 - The app runs and the affected flows behave as expected.
 
 Each feature document in [docs/](docs/) ends with a manual verification
 checklist for that area. Use the relevant one.
-
-Once a test framework exists, this section becomes the ordinary requirement that
-all additions and modifications ship with tests, and that the full suite passes
-before a pull request is opened.
 
 ## Issues
 
@@ -147,7 +142,7 @@ All pull requests must be reviewed by **at least one other team member**. As a
 reviewer you should:
 
 - Pull the branch and run the code, confirming it works as described.
-- Run `npm run codestyle` and `npm run build`.
+- Run `npm test`, `npm run codestyle`, and `npm run build`.
 - Check the code is clear, commented where it needs to be, and maintainable.
 - Check the pull request says what was manually verified.
 - Check that any behaviour change is reflected in the relevant document in

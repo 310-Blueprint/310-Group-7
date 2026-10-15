@@ -114,6 +114,8 @@ what already works.
 | `npm run dev` | Start the development server |
 | `npm run build` | Build for production into `dist` |
 | `npm run lint` | Run ESLint across the project |
+| `npm test` | Run the automated test suite once |
+| `npm run test:watch` | Rerun tests while files change |
 | `npm run preview` | Serve the production build locally |
 | `npm run prettier` | Run Prettier's .check, does not modify any files |
 | `npm run codestyle` | Run lint & prettier together |
@@ -125,13 +127,13 @@ There is a pre-commit hook setup with `husky` and `lint-staged` that will run
 
 ### Testing
 
-The project does **not** currently have a test framework or any automated tests.
-This is the largest known gap and is tracked as the top item in
-[docs/ROADMAP.md](docs/ROADMAP.md), which also lists suggested first targets.
+The project uses **Vitest and React Testing Library**. The first automated tests
+cover the login and Documents flows without requiring Supabase credentials or
+changing real data.
 
-Until one is adopted, verify changes with `npm run lint`, `npm run build`, and by
-running the app and exercising the affected flows. The feature documents in
-[docs/](docs/) each end with a manual verification checklist.
+Run `npm test`, `npm run codestyle`, and `npm run build` before opening a pull
+request. Also run the app and exercise the affected flows; the feature documents
+in [docs/](docs/) each end with a manual verification checklist.
 
 ### Deployment
 

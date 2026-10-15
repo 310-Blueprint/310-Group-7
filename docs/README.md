@@ -32,6 +32,7 @@ in [ROADMAP.md](ROADMAP.md) so it is recorded in exactly one place.
 
 ## One thing to know up front
 
-The project has **no test framework and no automated tests**. This is the
-largest known gap and is tracked in [ROADMAP.md](ROADMAP.md). Verification is
-currently manual, plus `npm run lint` and `npm run build`.
+The project uses **Vitest and React Testing Library**. Automated coverage starts
+with the login and Documents flows, and [ROADMAP.md](ROADMAP.md) lists the most
+valuable areas still needing tests. Run `npm test`, `npm run codestyle`, and
+`npm run build`, then complete the relevant manual verification checklist.
