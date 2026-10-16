@@ -15,18 +15,17 @@ need no Supabase access beyond a working local setup. The greeting fix under
 that touches real application code: `useAuth()` already exposes the signed-in
 user, so it is a genuine improvement in a few lines.
 
-## The largest testing gap: incomplete coverage
+## Testing
 
-The project uses **Vitest and React Testing Library**. Login and Documents have
-automated coverage for their main success, loading, and failure paths. Supabase
-and browser APIs are mocked so the suite runs without credentials or real data.
+The project uses **Vitest and React Testing Library**. Login, Documents and
+Analytics have automated coverage for their main success, loading, and failure
+paths. Supabase and browser APIs are mocked so the suite runs without
+credentials or real data.
 
 Coverage is still incomplete. The highest-value next targets are:
 
 - `findContainer` and the drag handlers in `DashboardPage.jsx`.
 - The status and column mapping in `src/lib/applications.js`.
-- The aggregation in `src/lib/analytics.js`, which is already pure and takes
-  its columns as an argument.
 - Form validation in `ApplicationModal.jsx`.
 - Both route guards, which are small but security-relevant.
 

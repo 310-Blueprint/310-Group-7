@@ -42,6 +42,10 @@ counts towards Sent, Interview, and Offer.
 | `interview` | 2 | Sent, Interview |
 | `offer` | 3 | Sent, Interview, Offer |
 
+Any other or missing `status` has no rank and counts towards no stage.
+**UPON ADDING A NEW STATUS**, confirm whether it needs a new rank and how it should 
+be handled by countReached.
+
 Two consequences follow:
 
 - **Moving a card backwards changes history.** Dragging a card from Interview
@@ -138,17 +142,17 @@ panels sit side by side from `lg`. See [ui-and-layout.md](ui-and-layout.md).
 
 ## Verification
 
-There are no automated tests. Verify by hand:
+Run `npm test` for automated coverage. `src/lib/analytics.test.js` covers the
+aggregation: reached-stage counting, rejected and unknown statuses, `null`
+rates for empty denominators, percentage formatting, the stage breakdown, the
+funnel and the summary. `src/pages/analytics/AnalyticsPage.test.jsx` covers the
+loading, error and empty states, the stat cards and their captions, both
+charts, and refetching when the signed-in user changes. `fetchApplications` is
+mocked, so also verify the real integration by hand:
 
-- `npm run lint` and `npm run build` pass.
-- Sign in as a user with no applications and confirm the empty state appears,
-  with a working link to the dashboard.
-- Add applications so every column has at least one. Confirm each stage count
-  matches the board, and the shares match count ÷ tracked.
-- Check Sent equals everything outside To apply, and that both rates match the
-  "x of y" captions.
-- With every application in To apply, confirm both rates show `—` and the
-  funnel shows its prompt instead of bars.
+- `npm test`, `npm run codestyle`, and `npm run build` pass.
+- Sign in with real applications and confirm each stage count matches the
+  board.
 - Move a card on the board, return to Analytics, and confirm the numbers change.
 - Sign in as a different user and confirm the first user's figures do not
   appear.

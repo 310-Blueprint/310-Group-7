@@ -14,15 +14,17 @@ export const FUNNEL_STAGES = [
   { id: 'offer', title: 'Offer' },
 ]
 
+// Unknown or missing statuses have no rank, so they never count as reached.
 function rankOf(status) {
-  return STAGE_RANK[status] ?? 0
+  return Object.hasOwn(STAGE_RANK, status) ? STAGE_RANK[status] : null
 }
 
 export function countReached(applications, status) {
   const target = rankOf(status)
-  return applications.filter(
-    (application) => rankOf(application.status) >= target
-  ).length
+  return applications.filter((application) => {
+    const rank = rankOf(application.status)
+    return rank !== null && rank >= target
+  }).length
 }
 
 // NULL required to avoid displaying 0% for stages without any applications.
