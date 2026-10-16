@@ -22,9 +22,10 @@ This is sorted the same way using `.dueDate`.
 
 ## Verification
 
-There are no automated tests. Verify by hand:
+Tests are stored in `CalendarPage.test.jsx`, remember to add new ones when new functionality is implemented.
 
-- `npm run lint` and `npm run build` pass.
+For manual verification:
+- `npm run codestyle` and `npm run build` pass.
 - Ensure that all applications in the dashboard show up on the calendar.
 - Make & delete some applications and see if those changes are reflected in the calendar.
 - Repeat with tasks.

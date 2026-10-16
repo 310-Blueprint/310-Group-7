@@ -223,6 +223,7 @@ function CalendarPage() {
       >
         {Array.from({ length: firstDayIndex }).map((_, index) => (
           <CalendarDay
+            key={index}
             id={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
             title={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
             events={getApplicationForDate(
@@ -237,6 +238,7 @@ function CalendarPage() {
 
         {Array.from({ length: daysInMonth }).map((_, index) => (
           <CalendarDay
+            key={index}
             id={getDayIndex(index, daysInMonth).toString()}
             title={getDayIndex(index, daysInMonth).toString()}
             events={getApplicationForDate(items, year, month, index + 1)}
@@ -251,6 +253,7 @@ function CalendarPage() {
 
         {Array.from({ length: daysInNextMonth }).map((_, index) => (
           <CalendarDay
+            key={index}
             id={(index + 1).toString()}
             title={(index + 1).toString()}
             events={getApplicationForDate(
