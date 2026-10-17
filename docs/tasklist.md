@@ -182,7 +182,9 @@ one-, two-, and four-column layouts; see
 
 ## Verification
 
-There are no dedicated automated Task List tests in the inspected project.
+Test are stored in TaskListPage.test.jsx, run to test functionality. 
+Please remember to add new test cases when new functionality is implemented.
+
 Verify manually:
 
 - Run `npm run lint` and `npm run build`.
