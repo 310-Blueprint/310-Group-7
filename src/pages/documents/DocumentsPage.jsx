@@ -105,7 +105,13 @@ function DocumentsPage() {
       setIsLoading(false)
     }
 
-    loadDocuments()
+    loadDocuments().catch((error) => {
+      console.error('Could not load documents:', error)
+      if (active) {
+        setErrorMessage('Could not load your documents. Try refreshing.')
+        setIsLoading(false)
+      }
+    })
 
     return () => {
       active = false

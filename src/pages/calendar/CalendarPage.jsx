@@ -221,50 +221,66 @@ function CalendarPage() {
         style={borderStyle}
         className="relative z-10 grid flex-1 grid-cols-7 grid-rows-${rows} gap-0"
       >
-        {Array.from({ length: firstDayIndex }).map((_, index) => (
-          <CalendarDay
-            key={index}
-            id={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
-            title={(daysInPrevMonth - (firstDayIndex - index) + 1).toString()}
-            events={getApplicationForDate(
-              items,
-              prevYear,
-              prevMonth,
-              daysInPrevMonth - (firstDayIndex - index) + 1
-            )}
-            tasks={[]}
-          />
-        ))}
+        {Array.from({ length: firstDayIndex }).map((_, index) => {
+          const dayIndex = (
+            daysInPrevMonth -
+            (firstDayIndex - index) +
+            1
+          ).toString()
 
-        {Array.from({ length: daysInMonth }).map((_, index) => (
-          <CalendarDay
-            key={index}
-            id={getDayIndex(index, daysInMonth).toString()}
-            title={getDayIndex(index, daysInMonth).toString()}
-            events={getApplicationForDate(items, year, month, index + 1)}
-            tasks={getApplicationForDate(tasks, year, month, index + 1)}
-            isCurrent={
-              today.getFullYear() === year &&
-              today.getMonth() === month &&
-              today.getDate() === index + 1
-            }
-          />
-        ))}
+          return (
+            <CalendarDay
+              key={`${prevYear}-${prevMonth}-${dayIndex}`}
+              id={dayIndex}
+              title={dayIndex}
+              events={getApplicationForDate(
+                items,
+                prevYear,
+                prevMonth,
+                daysInPrevMonth - (firstDayIndex - index) + 1
+              )}
+              tasks={[]}
+            />
+          )
+        })}
 
-        {Array.from({ length: daysInNextMonth }).map((_, index) => (
-          <CalendarDay
-            key={index}
-            id={(index + 1).toString()}
-            title={(index + 1).toString()}
-            events={getApplicationForDate(
-              items,
-              nextYear,
-              nextMonth,
-              index + 1
-            )}
-            tasks={[]}
-          />
-        ))}
+        {Array.from({ length: daysInMonth }).map((_, index) => {
+          const dayIndex = getDayIndex(index, daysInMonth).toString()
+
+          return (
+            <CalendarDay
+              key={`${year}-${month}-${dayIndex}`}
+              id={dayIndex}
+              title={dayIndex}
+              events={getApplicationForDate(items, year, month, index + 1)}
+              tasks={getApplicationForDate(tasks, year, month, index + 1)}
+              isCurrent={
+                today.getFullYear() === year &&
+                today.getMonth() === month &&
+                today.getDate() === index + 1
+              }
+            />
+          )
+        })}
+
+        {Array.from({ length: daysInNextMonth }).map((_, index) => {
+          const dayIndex = (index + 1).toString()
+
+          return (
+            <CalendarDay
+              key={`${nextYear}-${nextMonth}-${dayIndex}`}
+              id={dayIndex}
+              title={dayIndex}
+              events={getApplicationForDate(
+                items,
+                nextYear,
+                nextMonth,
+                index + 1
+              )}
+              tasks={[]}
+            />
+          )
+        })}
       </div>
 
       <img

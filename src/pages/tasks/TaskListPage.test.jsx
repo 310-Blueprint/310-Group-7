@@ -206,9 +206,9 @@ describe('TaskListPage', () => {
 
     render(<TaskListPage />)
 
-    expect(
-      await screen.findByRole('alert', { name: '' })
-    ).toHaveTextContent("Couldn't load tasks. Try refreshing.")
+    expect(await screen.findByRole('alert', { name: '' })).toHaveTextContent(
+      "Couldn't load tasks. Try refreshing."
+    )
     expect(screen.queryByText(LOADING)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '+ Add task' })).toBeDisabled()
   })
@@ -220,8 +220,9 @@ describe('TaskListPage', () => {
 
     expect(fetchTasksByColumn).toHaveBeenCalledTimes(1)
     expect(fetchTasksByColumn).toHaveBeenCalledWith(TASK_COLUMNS)
-    expect(screen.getByRole('heading', { name: 'Hello, Busy Beaver' }))
-      .toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Hello, Busy Beaver' })
+    ).toBeInTheDocument()
     expect(
       within(screen.getByRole('region', { name: 'todo' })).getByText(
         'Prepare portfolio'
@@ -240,9 +241,9 @@ describe('TaskListPage', () => {
 
     const dueSoon = within(screen.getByRole('region', { name: 'Due Soon' }))
     expect(
-      dueSoon.getAllByText(/Submit references|Prepare portfolio/).map(
-        (task) => task.textContent
-      )
+      dueSoon
+        .getAllByText(/Submit references|Prepare portfolio/)
+        .map((task) => task.textContent)
     ).toEqual(['Submit references', 'Prepare portfolio'])
     expect(dueSoon.queryByText('Completed task')).not.toBeInTheDocument()
   })
