@@ -8,9 +8,10 @@ means rather than repeating it.
 
 1. Create a Supabase project.
 2. Open the SQL editor and run [`schema.sql`](../schema.sql) top to bottom. It
-   creates both tables, enables row-level security, adds the policies, creates
-   the private `documents` Storage bucket, and adds a trigger that keeps
-   `updated_at` current.
+   creates the `applications`, `documents`, and `tasks` tables, enables
+   row-level security, adds their policies, creates the private `documents`
+   Storage bucket, and adds triggers that keep application and task
+   `updated_at` timestamps current.
 3. Copy the project URL and publishable key from Settings, then API, into
    `.env.local`. See [authentication.md](authentication.md).
 
@@ -60,13 +61,66 @@ The status mapping is the important half:
 | `rejected` | **no column** |
 
 `rejected` is allowed by the CHECK constraint but has no entry in
-`STATUS_BY_COLUMN` and no column in `src/pages/dashboardData.js`. A row with
-that status is silently invisible in the UI. Either add a fifth column or drop
-the value from the constraint; see [ROADMAP.md](ROADMAP.md).
+`STATUS_BY_COLUMN` and no column in `src/pages/dashboard/dashboardData.js`. A row with
+that status is silently invisible on the board, and Job Analytics counts it as
+sent but no further. Either add a fifth column or drop the value from the
+constraint; see [ROADMAP.md](ROADMAP.md).
 
-The board's column titles are defined once in `src/pages/dashboardData.js`. If
+### Read by Job Analytics
+
+The analytics page at `/analytics` reads this table through the same
+`fetchApplications()` call as the board, and never writes to it. Only the
+current `status` is stored, with no history of earlier stages, so analytics
+infers the furthest stage an application reached from where it is now. See
+[job-analytics.md](job-analytics.md).
+
+The board's column titles are defined once in `src/pages/dashboard/dashboardData.js`. If
 you add or rename a column there, update `STATUS_BY_COLUMN` and the CHECK
 constraint to match, or inserts will fail.
+
+## `tasks`
+
+One row per task on the Task List board at `/tasks`. Tasks are standalone
+records, not linked to a particular internship application. The three stored
+statuses are the draggable columns; Due Soon is a derived view, not a stored
+status. See [task-list.md](task-list.md) for the UI behaviour.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | `uuid` | Primary key, generated on insert; also the draggable item ID. |
+| `user_id` | `uuid` | Defaults to `auth.uid()`; cascades on user delete. |
+| `title` | `text` | Required; a CHECK constraint rejects empty or whitespace-only titles. |
+| `description` | `text` | Optional. |
+| `due_date` | `date` | Optional due date, stored without a time of day. |
+| `status` | `text` | CHECK-constrained to `todo`, `in_progress`, or `completed`; defaults to `todo`. |
+| `position` | `int` | Ordering of a task **within** its status column. |
+| `created_at` | `timestamptz` | Set on insert. |
+| `updated_at` | `timestamptz` | Maintained by the `tasks_set_updated_at` trigger. |
+
+### Database to UI mapping
+
+`src/lib/tasks.js` contains the Supabase calls. The `toTask()` helper maps
+`due_date` to `dueDate`, converts a nullable description to an empty string,
+and passes through `id`, `title`, `status`, and `position`. Unlike the
+applications board, the stored task statuses and their column IDs match:
+
+| `status` value | Task List column |
+| --- | --- |
+| `todo` | To Do |
+| `in_progress` | In Progress |
+| `completed` | Completed |
+
+Due Soon has **no** `due_soon` status in the database. The page calculates it
+from non-completed tasks whose due dates fall between today and seven days
+from today, inclusive. Tasks shown there remain in their original column and
+represent only one database record.
+
+`fetchTasksByColumn()` fetches rows and groups them by status, ordered by
+`position` and then `created_at`. `insertTask()`, `updateTask()`, and
+`deleteTask()` persist individual changes. `updateTaskPositions()` updates the
+status and position of tasks after a drag, using separate requests for each
+row. The composite index `tasks_user_status_position_idx` covers
+`(user_id, status, position)` for user-scoped board queries and ordering.
 
 ## `documents`
 
@@ -74,7 +128,7 @@ Metadata about an uploaded file: `doc_type` (`cv`, `cover_letter`, or
 `transcript`), the original `file_name` for display, and the `storage_path`
 inside the bucket.
 
-**No code reads or writes this table yet.** `src/pages/DocumentsPage.jsx` works
+**No code reads or writes this table yet.** `src/pages/documents/DocumentsPage.jsx` works
 directly against Storage and derives the display name by stripping the UUID
 prefix off the storage path. That means document type is not recorded anywhere,
 and a file whose original name contained something that looks like a UUID
@@ -83,16 +137,17 @@ prefix will display oddly. Wiring the page to this table is tracked in
 
 ## Row-level security is the security boundary
 
-Both tables have RLS enabled with a single `for all` policy scoped
+All three tables have RLS enabled with a `for all` policy scoped
 `to authenticated`, checking `auth.uid() = user_id` in both `using` and
 `with check`. Anonymous clients get nothing at all.
 
 This is not belt-and-braces. It is the only thing separating users. In
-`src/lib/applications.js`, `fetchApplicationsByColumn` runs `select('*')` with
+`src/lib/applications.js`, `fetchApplications` runs `select('*')` with
 **no client-side filter on `user_id`**. It returns every row the database is
 willing to hand over, and the policy is what makes that set the caller's own
-rows. Adding a `.eq('user_id', ...)` would be redundant; removing the policy
-would expose every user's board.
+rows. `src/lib/tasks.js` also fetches tasks without an explicit `user_id`
+filter and relies on the Tasks RLS policy. Adding a `.eq('user_id', ...)` would
+be redundant; disabling RLS would expose other users' data.
 
 The Storage bucket works the same way, keyed on the first path segment rather
 than a column. That is described in [documents.md](documents.md).
@@ -111,13 +166,15 @@ than a column. That is described in [documents.md](documents.md).
   alter table public.applications add column if not exists location text;
   ```
 
-- **Empty board for a user who definitely has applications** usually means you
-  are signed in as a different user than the one who created them. Rows are
-  scoped per user with no shared or admin view.
+- **Empty board for a user who definitely has applications or tasks** usually
+  means you are signed in as a different user than the one who created them.
+  Rows are scoped per user with no shared or admin view.
 
 ## Future work
 
 - `rejected` status has no board column, so those rows are invisible.
+- Application status changes are not recorded, which limits what analytics can
+  measure.
 - The `documents` table is unused; document metadata is derived from the storage
   path instead.
 

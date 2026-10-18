@@ -58,14 +58,41 @@ create table public.documents (
 create index documents_user_id_idx on public.documents (user_id);
 
 
+-- ------------------------------------------------------------
+-- 3. TASKS
+--    One row per task in the Task List page. The `status` values
+--    represent the three draggable columns. Due Soon is calculated
+--    from due_date and is not stored as a separate status.
+-- ------------------------------------------------------------
+create table public.tasks (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null default auth.uid()
+                 references auth.users(id) on delete cascade,
+  title        text not null
+                 check (length(trim(title)) > 0),
+  description  text,
+  due_date     date,
+  status       text not null default 'todo'
+                 check (status in ('todo','in_progress','completed')),
+  position     int  not null default 0,  -- ordering of a task WITHIN its column
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+-- Queries filter by the logged-in user and order tasks by column position.
+create index tasks_user_status_position_idx
+  on public.tasks (user_id, status, position);
+
+
 -- ============================================================
--- 3. ROW LEVEL SECURITY
+-- 4. ROW LEVEL SECURITY
 --    Enable RLS, then allow each user to touch ONLY their own
 --    rows. `to authenticated` blocks anonymous access entirely.
 --    A single FOR ALL policy covers select/insert/update/delete.
 -- ============================================================
 alter table public.applications enable row level security;
 alter table public.documents    enable row level security;
+alter table public.tasks        enable row level security;
 
 create policy "Users manage own applications"
   on public.applications for all
@@ -79,9 +106,54 @@ create policy "Users manage own documents"
   using      (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+create policy "Users manage own tasks"
+  on public.tasks for all
+  to authenticated
+  using      (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+
+-- ------------------------------------------------------------
+-- 4. PUSH NOTIFICATIONS
+-- ------------------------------------------------------------
+create table if not exists public.push_subscriptions (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null default auth.uid()
+               references auth.users(id) on delete cascade,
+  endpoint   text not null unique,
+  p256dh     text not null,
+  auth       text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists push_subscriptions_user_id_idx
+  on public.push_subscriptions (user_id);
+
+alter table public.push_subscriptions enable row level security;
+
+create policy "Users manage own push subscriptions"
+  on public.push_subscriptions for all
+  to authenticated
+  using      (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create table if not exists public.push_notification_deliveries (
+  id                   uuid primary key default gen_random_uuid(),
+  application_id       uuid not null
+                         references public.applications(id) on delete cascade,
+  push_subscription_id uuid not null
+                         references public.push_subscriptions(id) on delete cascade,
+  reminder_date        date not null,
+  created_at           timestamptz not null default now(),
+  unique (application_id, push_subscription_id, reminder_date)
+);
+
+alter table public.push_notification_deliveries enable row level security;
+
 
 -- ============================================================
--- 4. STORAGE BUCKET  (holds the actual document files)
+-- 5. STORAGE BUCKET  (holds the actual document files)
 --    Private bucket. Files are namespaced by user id so the
 --    folder-level policies below keep users out of each
 --    other's files.
@@ -106,7 +178,7 @@ create policy "Users manage own files"
 
 
 -- ============================================================
--- 5. AUTO-UPDATE updated_at ON applications  (optional but tidy)
+-- 6. AUTO-UPDATE updated_at ON applications  (optional but tidy)
 --    Keeps updated_at fresh whenever a card is edited or moved.
 -- ============================================================
 create or replace function public.set_updated_at()
@@ -121,4 +193,9 @@ $$;
 
 create trigger applications_set_updated_at
   before update on public.applications
+  for each row execute function public.set_updated_at();
+
+-- Keep updated_at fresh whenever a task is edited or moved.
+create trigger tasks_set_updated_at
+  before update on public.tasks
   for each row execute function public.set_updated_at();

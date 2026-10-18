@@ -15,23 +15,17 @@ need no Supabase access beyond a working local setup. The greeting fix under
 that touches real application code: `useAuth()` already exposes the signed-in
 user, so it is a genuine improvement in a few lines.
 
-## The largest gap: no tests
+## Testing
 
-The project has **no test framework and no automated tests**. Nothing is
-configured in `package.json`, and there is no `test` script.
+The project uses **Vitest and React Testing Library**. Login, Documents and
+Analytics have automated coverage for their main success, loading, and failure
+paths. Supabase and browser APIs are mocked so the suite runs without
+credentials or real data.
 
-This is the single biggest piece of outstanding work, and it blocks the
-contribution workflow in [CONTRIBUTING.md](../CONTRIBUTING.md), which requires
-that changes ship with tests. Until a framework is adopted, verification is
-manual, plus `npm run lint` and `npm run build`.
-
-Suggested starting point: Vitest with React Testing Library, which fits a Vite
-project without extra build configuration. The highest-value first targets are
-the pure logic that currently has no coverage at all:
+Coverage is still incomplete. The highest-value next targets are:
 
 - `findContainer` and the drag handlers in `DashboardPage.jsx`.
 - The status and column mapping in `src/lib/applications.js`.
-- `toDisplayName` and the UUID-prefix regex in `DocumentsPage.jsx`.
 - Form validation in `ApplicationModal.jsx`.
 - Both route guards, which are small but security-relevant.
 
@@ -52,10 +46,16 @@ the pure logic that currently has no coverage at all:
 ### Data model
 
 - **`rejected` status has no board column.** The database CHECK constraint
-  allows it, but `src/pages/dashboardData.js` defines four columns and
+  allows it, but `src/pages/dashboard/dashboardData.js` defines four columns and
   `STATUS_BY_COLUMN` has no entry for it, so a row with that status is silently
-  invisible. Either add a fifth column or drop the value from the constraint.
-  See [database.md](database.md).
+  invisible on the board, and Job Analytics can only count it as sent. Either
+  add a fifth column or drop the value from the constraint. See
+  [database.md](database.md).
+- **No application stage history.** `applications` stores only the current
+  `status`. Job Analytics infers the furthest stage reached from it, so moving a
+  card backwards rewrites its conversion history, and time-in-stage metrics are
+  impossible. A table of status changes would fix both. See
+  [job-analytics.md](job-analytics.md).
 - **The `documents` table is unused.** [`schema.sql`](../schema.sql) creates it,
   but `DocumentsPage.jsx` works directly off Storage and derives display names
   from the path, so `doc_type` is not recorded anywhere and the interface cannot
@@ -63,8 +63,9 @@ the pure logic that currently has no coverage at all:
 
 ### User experience
 
-- **The greeting is hardcoded.** Both `DashboardPage.jsx` and `DocumentsPage.jsx`
-  render "Hello, Stranger" even though `useAuth()` exposes the signed-in user.
+- **The greeting is generic.** The shared `PageGreeting` component renders
+  “Hello, Busy Beaver” across the authenticated pages instead of using the
+  signed-in user's name, even though `useAuth()` exposes the user.
 - **No user profile.** There is no `/profile` route and no way to change a
   display name, email, or password while signed in. Password reset only works
   through the signed-out email flow.
@@ -82,19 +83,7 @@ the pure logic that currently has no coverage at all:
 
 ## Housekeeping
 
-- Remove `@dnd-kit/dom` from `package.json`. It is declared but imported
-  nowhere.
-- Remove `src/App.css`. It is tracked but imported nowhere.
-- Remove `public/favicon.svg`. `index.html` points at `favicon.png` instead.
-- Remove `src/assets/leaf1.png`, `leaf2.png`, and `logo.png`, which are imported
-  nowhere and are around 500 KB of dead weight in the repository.
-- Re-export `beaver.png` (651 KB) and `beaverArms.png` (205 KB) as SVG, like the
-  grass already is. They are most of the bundle. See
-  [ui-and-layout.md](ui-and-layout.md).
-- Add Prettier and an `.editorconfig`. Formatting is inconsistent across the
-  codebase: most files use two-space indentation and no semicolons, while
-  `src/components/ApplicationModal.jsx` uses four spaces, semicolons, and double
-  quotes.
+- Nothing so far!
 
 ## Planned for A2
 
@@ -107,17 +96,19 @@ enough to be broken into several issues.
 | Task management | Reminders and to-dos attached to an application. |
 | Notifications and reminders | Depends on the calendar and task work. |
 | Job search and filtering | Searching and filtering across the board. |
-| Job analytics | Response rates, time-to-interview, and similar, over a user's own applications. |
 | Saved internships | Roles saved to apply to later, distinct from applications already in progress. |
 | AI CV and cover letter tailorer | The original motivation for the project: tailoring stored documents to a specific role. Needs the `documents` table wired up first so document type is known. |
+
+Job analytics has shipped as an MVP: totals, a stage breakdown, and conversion
+rates. Response times, time-to-interview, and a date-range filter depend on the
+stage history gap above; see [job-analytics.md](job-analytics.md).
 
 ## Documentation and repository setup
 
 - **No CI workflows.** `.github/` holds the issue and pull request templates but
-  no GitHub Actions. Lint and build are run by hand by the author and again by
-  the reviewer. A workflow running `npm run lint` and `npm run build` on every
-  pull request would catch breakage before review, and is the natural place to
-  hang a test suite once one exists.
+  no GitHub Actions. Tests, lint, and build are run by hand by the author and
+  again by the reviewer. A workflow running `npm test`, `npm run lint`, and
+  `npm run build` on every pull request would catch breakage before review.
 - **Sonar and Snyk are configured outside the repository.** There is no
   `sonar-project.properties` and no Snyk configuration tracked here, so the
   analysis setup is not reproducible by a new contributor from the repository

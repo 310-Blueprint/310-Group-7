@@ -12,7 +12,7 @@ filtering; see [database.md](database.md).
 
 ## The board model
 
-`src/pages/dashboardData.js` defines the four workflow stages and nothing else:
+`src/pages/dashboard/dashboardData.js` defines the four workflow stages and nothing else:
 
 | Column | Theme token |
 | --- | --- |
@@ -21,7 +21,7 @@ filtering; see [database.md](database.md).
 | Interview | `bg-brand-green` |
 | Offer | `bg-brand-yellow` |
 
-Board data lives in `items` state, shaped `{ columnTitle: [application] }`. It
+Board data lives in `items` state, shaped `{ columnId: [application] }`. It
 starts empty and is loaded from Supabase in a `useEffect` on mount. A small
 "Loading your applications" line, or an error line, shows while that is in
 flight.
@@ -30,16 +30,38 @@ The database calls the columns something else (`to_apply`, `applied`, and so on)
 and `position` orders cards within a column. All of that translation lives in
 `src/lib/applications.js`, documented in [database.md](database.md).
 
+## Filtering and sorting
+
+The dashboard has a filter modal triggered by the filter button in the header.
+It accepts text filters for `company`, `location`, and `role`, and a due-date
+sort option with these values:
+
+- `""` = default board order
+- `"asc"` = earliest due date first
+- `"desc"` = latest due date first
+
+The actual matching happens in `DashboardPage.jsx`:
+
+- `matchesText(value, filter)` trims the filter, lowercases both strings, and
+  returns `true` when the field is empty or when it includes the search text.
+- `matchesFilters(application, filters)` applies the company, location, and role
+  checks together with logical AND semantics.
+- `filterItems(items, filters)` runs each column through those rules, then re-sorts
+  the visible items by `dueDate` when `sortOrder` is set.
+
+This means the filter is purely client-side and only affects the visible
+board; it does not change the database rows or the persisted status ordering.
+
 ## The data layer
 
 `src/lib/applications.js` is the only file that talks to the `applications`
 table:
 
-- `fetchApplicationsByColumn(columns)` loads all rows the caller can see and
-  groups them by status, translated to column title, into the shape the board
-  uses.
-- `insertApplication(data)` inserts a new row including `user_id`, and returns
-  it mapped to the UI's `{ id, company, location, role, dueDate }` shape.
+- `fetchApplications()` loads all rows the caller can see and returns them in
+  `position` order.
+- `insertApplication({ userId, ...fields })` inserts a new row including
+  `user_id`, and returns it mapped to the UI's `{ id, company, location, role,
+  dueDate }` shape.
 - `deleteApplication(id)` deletes one row.
 - `updateApplicationPositions(status, applications)` persists `status` and
   `position` for a whole column after a drag, one update per row.
@@ -90,11 +112,11 @@ droppable ids. The board tracks membership itself via a small
 
 The pieces:
 
-- **`src/components/SortableApplicationCard.jsx`** is a thin wrapper around
+- **`src/components/dashboard/SortableApplicationCard.jsx`** is a thin wrapper around
   `ApplicationCard` that calls `useSortable` and applies the drag transform and
   listeners to a wrapping `<div>`. This keeps `ApplicationCard` purely
   presentational, with no drag-related props.
-- **`src/components/StatusColumn.jsx`** is the drop target. `useDroppable({ id })`
+- **`src/components/dashboard/StatusColumn.jsx`** is the drop target. `useDroppable({ id })`
   sits on the column's content `<div>` so an empty column can still be dropped
   into, and the card list is wrapped in a `SortableContext` with
   `verticalListSortingStrategy`.
@@ -133,9 +155,6 @@ reordering cards already there.
 - `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` for drag and drop.
 - `canvas-confetti` for the offer celebration.
 
-`@dnd-kit/dom` is declared in `package.json` but imported nowhere. It should be
-removed; see [ROADMAP.md](ROADMAP.md).
-
 ## Layout and styling
 
 Column colours come from the shared theme tokens in `src/styles/preset.css`,
@@ -145,11 +164,15 @@ and four column layouts and the decorative beaver artwork, is covered in
 
 ## Verification
 
-There are no automated tests. Verify by hand:
+There are no automated dashboard tests. Verify by hand:
 
 - `npm run lint` and `npm run build` pass.
-- Reorder within a column, move a card across columns, and check the count
-  badges update.
+- Reorder within a column, move a card across columns, and confirm the visible
+  list updates without changing the underlying stored order until a drag ends.
+- Use the filter modal to narrow by company/location/role, then clear the
+  filters and confirm the full board returns.
+- Sort by earliest and latest due date and confirm the card order changes within
+  each column.
 - Add an application through the modal and confirm it appears in "To apply" and
   survives a refresh.
 - Drag a card into Offer and confirm the confetti fires.

@@ -1,12 +1,15 @@
 import { Routes, Route } from 'react-router-dom'
-import ProtectedRoute from './components/ProtectedRoute'
-import PublicOnlyRoute from './components/PublicOnlyRoute'
-import LoginPage from './pages/LoginPage'
-import SignUpPage from './pages/SignUpPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
-import DashboardPage from './pages/DashboardPage'
-import DocumentsPage from './pages/DocumentsPage'
+import ProtectedRoute from './components/routing/ProtectedRoute'
+import PublicOnlyRoute from './components/routing/PublicOnlyRoute'
+import LoginPage from './pages/auth/LoginPage'
+import SignUpPage from './pages/auth/SignUpPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import DashboardPage from './pages/dashboard/DashboardPage'
+import DocumentsPage from './pages/documents/DocumentsPage'
+import TaskListPage from './pages/tasks/TaskListPage'
+import CalendarPage from './pages/calendar/CalendarPage'
+import AnalyticsPage from './pages/analytics/AnalyticsPage'
 
 /*
  * Routing table. Three kinds of route:
@@ -63,6 +66,30 @@ function App() {
         element={
           <ProtectedRoute>
             <DocumentsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute>
+            <TaskListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <CalendarPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <AnalyticsPage />
           </ProtectedRoute>
         }
       />

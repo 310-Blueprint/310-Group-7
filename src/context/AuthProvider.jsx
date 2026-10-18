@@ -47,7 +47,7 @@ function AuthProvider({ children }) {
   // Derived, never stored separately — two states that must agree is a bug waiting to happen.
   const value = useMemo(
     () => ({ session, user: session?.user ?? null, loading }),
-    [session, loading],
+    [session, loading]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

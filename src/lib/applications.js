@@ -1,17 +1,13 @@
 import { supabase } from './supabaseClient'
 
-// DB `status` is constrained to this fixed set (see the `applications_status_check`
-// constraint) — it doesn't match the board's column titles, so map between them.
-const STATUS_BY_COLUMN = {
-  'To apply': 'to_apply',
-  'Applied / Waiting': 'applied',
-  Interview: 'interview',
-  Offer: 'offer',
+const COLUMN_BY_FIELD = {
+  company: 'company_name',
+  location: 'location',
+  role: 'role',
+  dueDate: 'due_date',
+  status: 'status',
+  position: 'position',
 }
-
-const COLUMN_BY_STATUS = Object.fromEntries(
-  Object.entries(STATUS_BY_COLUMN).map(([column, status]) => [status, column]),
-)
 
 function toApplication(row) {
   return {
@@ -20,10 +16,22 @@ function toApplication(row) {
     location: row.location,
     role: row.role,
     dueDate: row.due_date,
+    status: row.status,
+    position: row.position,
   }
 }
 
-export async function fetchApplicationsByColumn(columns) {
+function toRow(fields) {
+  return Object.fromEntries(
+    Object.entries(fields)
+      .filter(
+        ([field, value]) => field in COLUMN_BY_FIELD && value !== undefined
+      )
+      .map(([field, value]) => [COLUMN_BY_FIELD[field], value])
+  )
+}
+
+export async function fetchApplications() {
   const { data, error } = await supabase
     .from('applications')
     .select('*')
@@ -31,26 +39,13 @@ export async function fetchApplicationsByColumn(columns) {
 
   if (error) throw error
 
-  return columns.reduce((grouped, column) => {
-    grouped[column.title] = data
-      .filter((row) => COLUMN_BY_STATUS[row.status] === column.title)
-      .map(toApplication)
-    return grouped
-  }, {})
+  return data.map(toApplication)
 }
 
-export async function insertApplication({ company, location, role, dueDate, status, position, userId }) {
+export async function insertApplication({ userId, ...fields }) {
   const { data, error } = await supabase
     .from('applications')
-    .insert({
-      company_name: company,
-      location,
-      role,
-      due_date: dueDate,
-      status: STATUS_BY_COLUMN[status],
-      position,
-      user_id: userId,
-    })
+    .insert({ ...toRow(fields), user_id: userId })
     .select()
     .single()
 
@@ -64,11 +59,13 @@ export async function deleteApplication(id) {
 }
 
 export async function updateApplicationPositions(status, applications) {
-  const dbStatus = STATUS_BY_COLUMN[status]
   const results = await Promise.all(
     applications.map((application, index) =>
-      supabase.from('applications').update({ status: dbStatus, position: index }).eq('id', application.id),
-    ),
+      supabase
+        .from('applications')
+        .update({ status: status, position: index })
+        .eq('id', application.id)
+    )
   )
 
   const failed = results.find((result) => result.error)

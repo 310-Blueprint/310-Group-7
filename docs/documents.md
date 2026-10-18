@@ -40,9 +40,9 @@ otherwise be empty; the page filters it out of the list.
 
 | File | Role |
 | --- | --- |
-| `src/pages/DocumentsPage.jsx` | Loading, uploading, downloading, deleting. |
-| `src/components/DocumentCard.jsx` | One document row: icon, name, download, delete. |
-| `src/components/DocumentDropzone.jsx` | Drag-and-drop area and file picker. |
+| `src/pages/documents/DocumentsPage.jsx` | Loading, uploading, downloading, deleting. |
+| `src/components/documents/DocumentCard.jsx` | One document row: icon, name, download, delete. |
+| `src/components/documents/DocumentDropzone.jsx` | Drag-and-drop area and file picker. |
 
 ## Loading
 
@@ -123,9 +123,11 @@ path, which is why there is no notion of document type in the interface.
 
 ## Verification
 
-There are no automated tests. Verify by hand:
+Run `npm test` for automated coverage of loading and empty states, signed URL
+mapping, UUID display names, uploads, downloads, deletion, and storage failures.
+Storage is mocked, so also verify the real integration by hand:
 
-- `npm run lint` and `npm run build` pass.
+- `npm test`, `npm run codestyle`, and `npm run build` pass.
 - Upload by drag-and-drop and by the file picker, including multiple files at
   once.
 - Confirm uploaded files appear in the `documents` bucket in the Supabase
